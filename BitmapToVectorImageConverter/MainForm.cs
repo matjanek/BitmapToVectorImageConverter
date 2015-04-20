@@ -95,6 +95,8 @@ namespace BitmapToVectorImageConverter
             if (_inputImage != null)
             {
                 //TODO start konwersji obrazka z _inputImage z zadanymi parametrami
+                var converter = new RasterToVectorConverter(_inputImage);
+                converter.Convert();
                 /* 
                  * otrzymujemy _outputImage
                  * aktualnie przepisuje _inputImage do _outputImage bez zmian
