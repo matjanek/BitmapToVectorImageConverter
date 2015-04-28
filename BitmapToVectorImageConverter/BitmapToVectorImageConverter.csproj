@@ -75,6 +75,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="r2v\GisPolygonR2V.cs" />
+    <Compile Include="r2v\GisObjectR2V.cs" />
+    <Compile Include="r2v\GisChtArmR2V.cs" />
+    <Compile Include="r2v\GisCsArc.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -87,4 +91,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="r2v\" />
+  </ItemGroup>
 </Project>
