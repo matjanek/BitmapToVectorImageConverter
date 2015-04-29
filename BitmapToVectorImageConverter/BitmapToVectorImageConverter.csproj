@@ -79,6 +79,7 @@
     <Compile Include="r2v\GisObjectR2V.cs" />
     <Compile Include="r2v\GisChtArmR2V.cs" />
     <Compile Include="r2v\GisCsArc.cs" />
+    <Compile Include="r2v\GisConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
