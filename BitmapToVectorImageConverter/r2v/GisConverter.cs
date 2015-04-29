@@ -9,21 +9,36 @@ namespace BitmapToVectorImageConverter
 		{
 		}
 
+		static private long arcGlobalSystemIdCounter = 0;
+
 		static private GisCsArc createArc (int last, int j, GisChtArmR2V[] currArms)
 		{
+			var id = ++arcGlobalSystemIdCounter;
 			var arc = new GisCsArc ();
+			arc.mArcSystemId = id;
 			int n = j - last + 1;
 			arc.mListOfVertexCorrdinate = new GisObjectR2V[n];
-			arc [0] = currArms [last];
-			arc [n-1] = currArms [j];
+			arc.mListOfVertexCorrdinate [0] = currArms [last];
+			arc.mListOfVertexCorrdinate[n-1] = currArms [j];
 			for (var i = 1; i < n - 1; i++) {
-				arc [i] = new GisObjectR2V () {
+				arc.mListOfVertexCorrdinate [i] = new GisObjectR2V () {
 					x = last + i,
 					y = currArms[last].y
 				};
 			}
 			return arc;
 		}
+
+		GisCsArc createHorizontalArc (int j, GisChtArmR2V[] prevArms, GisChtArmR2V[] currArms)
+		{
+			var id = ++arcGlobalSystemIdCounter;
+			var arc = new GisCsArc ();
+			arc.mArcSystemId = ++arcGlobalSystemIdCounter;
+			arc.mListOfVertexCorrdinate = new GisObjectR2V[2];
+			arc.mListOfVertexCorrdinate [0] = prevArms [j];
+			arc.mListOfVertexCorrdinate [1] = currArms [j];
+			return arc;
+	}
 
 		public String Convert(Image img) {
 			var bmp = new Bitmap (img);
@@ -39,23 +54,16 @@ namespace BitmapToVectorImageConverter
 			var arms = new GisChtArmR2V[height, width];
 			var prevArms = new GisChtArmR2V[width];
 			var currArms = new GisChtArmR2V[width];
-			var joinedArms = new GisChtArmR2V[width];
+
 
 			for (var i = 1; i < height; i++) { // 2 linie bufor
 				var prevLine = data + (i - 1) * row;
 				var currLine = data + i * row;
 				for (var j = 0; j < width; j++) {
-					int cb = currLine [3 * j];
-					int cg = currLine [3 * j + 1];
-					int cr = currLine [3 * j + 2];
-					int c = cb * 256 * 256 + cg * 256 + cr;
+					int c = (currLine + j).ToInt32 ();;
+					int c2 = (j < width - 1) ? (currLine + j+1).ToInt32() : 0;
 
-					int cb2 = (j < width - 1) ? currLine[3 * (j+1)] : 0;
-					int cg2 = (j < width - 1) ? currLine[3 * (j+1)+1] : 0;
-					int cr2 = (j < width - 1) ? currLine[3 * (j+1)+2] : 0;
-					int c2 = cb2 * 256 * 256 + cg2 * 256 + cr2;
-
-					if (c != c2 || j == 0 || || j == width - 1) {
+					if (c != c2 || j == 0 || j == width - 1) {
 						currArms [j] = new GisChtArmR2V () {
 							x = j,
 							y = i,
@@ -82,15 +90,21 @@ namespace BitmapToVectorImageConverter
 
 				for (var j = 1; j < width; j++) {
 					if (currArms[j] != null) {
-						joinedArms[last] = createArc(last, j, currArms);
+						currArms[j].mpArcHorizontalArm = createArc(last, j, currArms);
 						last = j;
 					}
 				}
-
-				currArms = joinedArms;
-
+					
 				// Join with prior arm chain
 
+				for (var j = 0; j < width; j++) {
+					if (prevArms[j] != null) {
+						prevArms [j].mpArcVerticalArm = createHorizontalArc (j, prevArms, currArms);
+					}
+				}
+
+				// TODO inside/above polygons information passing
+					
 			}
 
 			bmp.UnlockBits (bmpData);

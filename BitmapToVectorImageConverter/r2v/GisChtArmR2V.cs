@@ -12,7 +12,7 @@ namespace BitmapToVectorImageConverter
 		public GisCsArc mpArcVerticalArm { get; set; }
 		public GisCsArc mpArcHorizontalArm { get; set; }
 		public GisChtArmR2V ()
-		{
+		{	
 		}
 	}
 }
