@@ -11,7 +11,7 @@ namespace BitmapToVectorImageConverter
 
 		static private long arcGlobalSystemIdCounter = 0;
 
-		static private GisCsArc createArc (int last, int j, GisChtArmR2V[] currArms)
+		static private GisCsArc createHorizontalArc (int last, int j, GisChtArmR2V[] currArms)
 		{
 			var id = ++arcGlobalSystemIdCounter;
 			var arc = new GisCsArc ();
@@ -90,7 +90,7 @@ namespace BitmapToVectorImageConverter
 
 				for (var j = 1; j < width; j++) {
 					if (currArms[j] != null) {
-						currArms[j].mpArcHorizontalArm = createArc(last, j, currArms);
+						currArms[j].mpArcHorizontalArm = createHorizontalArc(last, j, currArms);
 						last = j;
 					}
 				}
