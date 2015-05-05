@@ -166,9 +166,16 @@ namespace BitmapToVectorImageConverter
 			return c;
 		}
 
-		static GisChtArmR2V smartCopy (GisChtArmR2V gisChtArmR2V)
+		static GisChtArmR2V smartCopy (GisChtArmR2V item)
 		{
-			return gisChtArmR2V;
+			var result = new GisChtArmR2V ();
+			result.mlColPos = item.mlColPos;
+			result.mPixelValue = item.mPixelValue;
+			result.x = item.x;
+			result.y = item.y;
+			result.mpArmHorizontalVirtual = false;
+			result.mpArmVerticalVirtual = true;
+			return result;
 		}
 
 		static public String Convert(Image img) {
@@ -191,6 +198,8 @@ namespace BitmapToVectorImageConverter
 			Marshal.Copy (bmpData.Scan0, data, 0, height * bmpData.Stride);
 			int stride = bmpData.Stride;
 
+			// dla 1 linii może być problem TODO popraw
+
 			Console.Error.WriteLine ("Stride: {0}", stride);
 
 			for (var i = 0; i < height; i++) { // 2 linie bufor
@@ -208,8 +217,8 @@ namespace BitmapToVectorImageConverter
 
 						// tworzymy instancję "ramion"
 						currArms[j] = createNode (i, j, c);
-						currArms[j].mpArmHorizontalVirtual = c != c2;
-						currArms[j].mpArmVerticalVirtual = c != c3;
+						currArms[j].mpArmHorizontalVirtual = c != c3;
+						currArms [j].mpArmVerticalVirtual = false;
 					}						
 				}
 
@@ -220,20 +229,23 @@ namespace BitmapToVectorImageConverter
 				int c0n = getColor (data, i * row + 3);
 
 				currArms [0] = createNode (i, 0, c0);
-				currArms[0].mpArmHorizontalVirtual = c0 != c0n;
-				currArms[0].mpArmVerticalVirtual = c0 != c0p;
+				currArms [0].mpArmHorizontalVirtual = c0 != c0p;
+				currArms [0].mpArmVerticalVirtual = false;
 
 				int cl = getColor (data, i * row + 3*(width-1));
 				int clp = getColor (data, (i-1) * row + 3*(width-1));
 				currArms [width-1] = createNode (i, width-1, getColor(data, 3*(width-1)));
 				currArms [width - 1].mpArmHorizontalVirtual = true; // tak zakładamy, że poza to różne
-				currArms [width - 1].mpArmVerticalVirtual = cl != clp;
+				currArms [width - 1].mpArmVerticalVirtual = false;
 				// na początku i na końcu zawsze musi być
+
+				var copyCurrArms = new GisChtArmR2V[width];
+				Array.Copy (currArms, copyCurrArms, width);
 
 				// dziedziczymy z poprzedniej linii
 				for (var j = 0; j < width; j++) {
 					if (currArms[j] == null && prevArms[j] != null) {
-						currArms [j] = prevArms [j];
+						currArms [j] = smartCopy(prevArms [j]);
 					}
 				}
 
@@ -251,10 +263,26 @@ namespace BitmapToVectorImageConverter
 				// Join with prior arm chain
 
 				for (var j = 0; j < width; j++) {
-					if (prevArms[j] != null) {
-						connectHorizontalArc (j, prevArms, currArms);
+					if (currArms[j]) {
+
+						// połącz z prevArms[j]
+						// jeśli nie ma utwórz z false horizontal
+
+						if (prevArms [j] == null) {
+							prevArms [j] = createNode (i, j, getColor (data, i * row + 3 * j));
+							prevArms [j].mpArmVerticalVirtual = true;
+							prevArms [j].mpArmHorizontalVirtual = false;
+						}
+
 					}
 				}
+
+				// currArms do prevArms
+				for (var j = 0; j < width; j++) {
+					arms [i, j] = currArms [j];
+				}
+
+				prevArms = copyCurrArms;
 					
 			}
 
