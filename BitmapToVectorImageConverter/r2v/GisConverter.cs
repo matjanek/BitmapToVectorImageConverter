@@ -147,8 +147,8 @@ namespace BitmapToVectorImageConverter
 			return new GisChtArmR2V () {
 				x = j,
 				y = i,
-				mlColPos = j,
 				mpAbovePolygon = new GisPolygonR2V(),
+				mlColPos = j,
 				mpLeftPolygon = new GisPolygonR2V(),
 				mpInsidePolygon = new GisPolygonR2V(),
 				mPixelValue = c,
@@ -212,6 +212,8 @@ namespace BitmapToVectorImageConverter
 						currArms[j].mpArmVerticalVirtual = c != c3;
 					}						
 				}
+
+				// popraw oznaczanie wirtualnych/normalnych ramion
 
 				int c0 = getColor (data, i * row);
 				int c0p = getColor (data, (i-1) * row);
