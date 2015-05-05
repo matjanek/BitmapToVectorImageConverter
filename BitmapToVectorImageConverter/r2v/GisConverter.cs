@@ -46,12 +46,24 @@ namespace BitmapToVectorImageConverter
 
 			switch (caseNr) {
 			case 0:
+				nextArm.mpAbovePolygon = upperArm.mpInsidePolygon;
+				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
+				// nextArm.mpInsidePolygon = swój własny
 				break;
 			case 1:
+				nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
+				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
+				// nextArm.mpInsidePolygon = swój własny
 				break;
 			case 2:
+				nextArm.mpAbovePolygon = upperArm.mpInsidePolygon;
+				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
+				// nextArm.mpInsidePolygon = swój własny
 				break;
 			case 3:
+				nextArm.mpAbovePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
+				// nextArm.mpInsidePolygon = swój własny
 				break;
 			case 4: // prawy
 				nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
