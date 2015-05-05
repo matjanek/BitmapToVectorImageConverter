@@ -70,30 +70,60 @@ namespace BitmapToVectorImageConverter
 				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
 				nextArm.mpInsidePolygon = upperArm.mpInsidePolygon;
 				break;
-			case 5: // lewy
+			case 5: // lewy	
 				nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
 				nextArm.mpInsidePolygon = prevArm.mpAbovePolygon;
 				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
 				break;
 			case 6:
+				nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
+				nextArm.mpInsidePolygon = upperArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
 				break;
 			case 7:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
 				break;
 			case 8:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
 				break;
 			case 9:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
 				break;
 			case 10:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = upperArm.mpInsidePolygon;
 				break;
 			case 11:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = prevArm.mpInsidePolygon;
 				break;
 			case 12:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
 				break;
 			case 13:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
 				break;
 			case 14:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
 				break;
 			case 15:
+				nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
+				nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
+				nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
 				break;
 			default:
 				throw new NotSupportedException ("There should not be such a case");
