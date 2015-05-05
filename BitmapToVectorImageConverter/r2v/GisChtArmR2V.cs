@@ -10,7 +10,9 @@ namespace BitmapToVectorImageConverter
 		public GisPolygonR2V mpAbovePolygon { get; set; }
 		public GisPolygonR2V mpLeftPolygon { get; set; }
 		public GisCsArc mpArcVerticalArm { get; set; }
+		public bool mpArmVerticalVirtual { get; set; }
 		public GisCsArc mpArcHorizontalArm { get; set; }
+		public bool mpArmHorizontalVirtual { get; set; }
 		public GisChtArmR2V ()
 		{	
 		}
