@@ -198,11 +198,39 @@ namespace BitmapToVectorImageConverter
 			Marshal.Copy (bmpData.Scan0, data, 0, height * bmpData.Stride);
 			int stride = bmpData.Stride;
 
-			// dla 1 linii może być problem TODO popraw
+			// dla 1 linii całość wypełniona
+
+			for (var j = 0; j < width; j++) {
+				arms [0, j] = createNode (i, j, getColor (data, 3 * j));
+				arms [0, j].mpLeftPolygon = arms [0, j - 1].mpInsidePolygon;
+				arms [0, j].mpAbovePolygon = null;
+				arms [0, j].mpArmVerticalVirtual = false;
+				arms [0, j].mpArmHorizontalVirtual = false;
+			}
+
+			arms [0, width - 1].mpArmHorizontalVirtual = true;
+			// wykrywanie różnic w 1. linii, konieczne dla 2. linii (w prevArms)
+
+			for (var j = 0; j < width; j++) {
+				int currIdx = i * stride + 3 * j;
+				int nextIdx = currIdx + 3;
+				var c = getColor (data, currIdx);
+				var c2 = getColor (data, nextIdx);
+
+				if (c != c2 || j == 0 || j == width - 1) {
+					prevArms [j] = createNode (0, j, getColor (data, 3 * j));
+					prevArms [j].mpArmVerticalVirtual = false;
+					prevArms [j].mpArmHorizontalVirtual = false;
+				}
+			}
+
+			prevArms [j].mpArmHorizontalVirtual = true;
+
+			// dane o 1. linii dla 2. linii uzupełnione
 
 			Console.Error.WriteLine ("Stride: {0}", stride);
 
-			for (var i = 0; i < height; i++) { // 2 linie bufor
+			for (var i = 1; i < height; i++) { // 2 linie bufor
 				for (var j = 1; j < width-1; j++) {
 					int currIdx = i * stride + 3 * j;
 					int bottomIdx = i * stride + 3 * j - row;
@@ -263,7 +291,7 @@ namespace BitmapToVectorImageConverter
 				// Join with prior arm chain
 
 				for (var j = 0; j < width; j++) {
-					if (currArms[j]) {
+					if (currArms[j] != null) {
 
 						// połącz z prevArms[j]
 						// jeśli nie ma utwórz z false horizontal
@@ -272,10 +300,13 @@ namespace BitmapToVectorImageConverter
 							prevArms [j] = createNode (i, j, getColor (data, i * row + 3 * j));
 							prevArms [j].mpArmVerticalVirtual = true;
 							prevArms [j].mpArmHorizontalVirtual = false;
+							// ale jeszcze trzeba je potem połączyć
 						}
 
 					}
 				}
+
+				var t = arms [i];
 
 				// currArms do prevArms
 				for (var j = 0; j < width; j++) {
