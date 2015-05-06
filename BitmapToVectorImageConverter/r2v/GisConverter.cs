@@ -14,13 +14,18 @@ namespace BitmapToVectorImageConverter
 
 		static private long arcGlobalSystemIdCounter = 0;
 
-		static private void connectTwoArcs (int prev, int next, 
-			GisChtArmR2V[] prevArms, GisChtArmR2V[] currArms)
+		static private void connectTwoArcs (int i, int prev, int next, 
+			GisChtArmR2V[,] arms)
 		{
-			var nextArm = currArms  [next];
-			var prevArm = currArms  [prev];
-			var upperArm = prevArms [next];
-			bool upperSolid = !prevArm.mpArmVerticalVirtual;
+			var nextArm = arms  [i,next];
+			var prevArm = arms  [i, prev];
+			var upperArm = arms [i-1,next];
+
+			if (upperArm == null) {
+				upperArm = prevArm;
+			}
+
+			bool upperSolid = upperArm != null ? !upperArm.mpArmVerticalVirtual : false;
 			bool bottomSolid = !nextArm.mpArmVerticalVirtual;
 			bool rightSolid = !nextArm.mpArmHorizontalVirtual;
 			bool leftSolid = !prevArm.mpArmHorizontalVirtual;
@@ -191,40 +196,31 @@ namespace BitmapToVectorImageConverter
 			Console.WriteLine ("PixelFormat: {0}", bmpData.PixelFormat);
 
 			var arms = new GisChtArmR2V[height, width];
-			var prevArms = new GisChtArmR2V[width];
-			var currArms = new GisChtArmR2V[width];
 
 			Byte[] data = new Byte[height*bmpData.Stride];
 			Marshal.Copy (bmpData.Scan0, data, 0, height * bmpData.Stride);
 			int stride = bmpData.Stride;
 
 			// dla 1 linii całość wypełniona
-
-			for (var j = 0; j < width; j++) {
-				arms [0, j] = createNode (i, j, getColor (data, 3 * j));
-				arms [0, j].mpLeftPolygon = arms [0, j - 1].mpInsidePolygon;
-				arms [0, j].mpAbovePolygon = null;
-				arms [0, j].mpArmVerticalVirtual = false;
-				arms [0, j].mpArmHorizontalVirtual = false;
-			}
-
-			arms [0, width - 1].mpArmHorizontalVirtual = true;
 			// wykrywanie różnic w 1. linii, konieczne dla 2. linii (w prevArms)
 
 			for (var j = 0; j < width; j++) {
-				int currIdx = i * stride + 3 * j;
+
+				int currIdx = 3*j;
 				int nextIdx = currIdx + 3;
 				var c = getColor (data, currIdx);
 				var c2 = getColor (data, nextIdx);
 
 				if (c != c2 || j == 0 || j == width - 1) {
-					prevArms [j] = createNode (0, j, getColor (data, 3 * j));
-					prevArms [j].mpArmVerticalVirtual = false;
-					prevArms [j].mpArmHorizontalVirtual = false;
+					arms [0,j] = createNode (0, j, getColor (data, 3 * j));
+					arms [0, j].mpLeftPolygon = null;
+					arms [0, j].mpAbovePolygon = null;
+					arms [0, j].mpArmVerticalVirtual = false;
+					arms [0, j].mpArmHorizontalVirtual = false;
 				}
 			}
 
-			prevArms [j].mpArmHorizontalVirtual = true;
+			arms[0,width-1].mpArmHorizontalVirtual = true;
 
 			// dane o 1. linii dla 2. linii uzupełnione
 
@@ -244,36 +240,33 @@ namespace BitmapToVectorImageConverter
 								i, j, c, c2);
 
 						// tworzymy instancję "ramion"
-						currArms[j] = createNode (i, j, c);
-						currArms[j].mpArmHorizontalVirtual = c != c3;
-						currArms [j].mpArmVerticalVirtual = false;
+						arms[i,j] = createNode (i, j, c);
+						arms[i,j].mpArmHorizontalVirtual = c == c3;
+						arms[i,j].mpArmVerticalVirtual = false;
 					}						
 				}
-
-				// popraw oznaczanie wirtualnych/normalnych ramion
+					
+				// ostatnia i przedostatnia kolumna
 
 				int c0 = getColor (data, i * row);
 				int c0p = getColor (data, (i-1) * row);
-				int c0n = getColor (data, i * row + 3);
 
-				currArms [0] = createNode (i, 0, c0);
-				currArms [0].mpArmHorizontalVirtual = c0 != c0p;
-				currArms [0].mpArmVerticalVirtual = false;
+				arms [i,0] = createNode (i, 0, c0);
+				arms [i,0].mpArmHorizontalVirtual = c0 != c0p;
+				arms [i,0].mpArmVerticalVirtual = false;
 
-				int cl = getColor (data, i * row + 3*(width-1));
-				int clp = getColor (data, (i-1) * row + 3*(width-1));
-				currArms [width-1] = createNode (i, width-1, getColor(data, 3*(width-1)));
-				currArms [width - 1].mpArmHorizontalVirtual = true; // tak zakładamy, że poza to różne
-				currArms [width - 1].mpArmVerticalVirtual = false;
+				arms [i,width-1] = createNode (i, width-1, getColor(data, 3*(width-1)));
+				arms [i,width - 1].mpArmHorizontalVirtual = true;
+				arms [i,width - 1].mpArmVerticalVirtual = false;
+
 				// na początku i na końcu zawsze musi być
 
 				var copyCurrArms = new GisChtArmR2V[width];
-				Array.Copy (currArms, copyCurrArms, width);
 
 				// dziedziczymy z poprzedniej linii
 				for (var j = 0; j < width; j++) {
-					if (currArms[j] == null && prevArms[j] != null) {
-						currArms [j] = smartCopy(prevArms [j]);
+					if (arms[i,j] == null && arms[i-1,j] != null) {
+						arms [i,j] = smartCopy(arms[i-1,j]);
 					}
 				}
 
@@ -282,8 +275,8 @@ namespace BitmapToVectorImageConverter
 				var last = 0;
 
 				for (var j = 1; j < width; j++) {
-					if (currArms[j] != null) {
-						connectTwoArcs(last, j, prevArms, currArms);
+					if (arms[i,j] != null) {
+						connectTwoArcs(i, last, j, arms);
 						last = j;
 					}
 				}
@@ -291,29 +284,43 @@ namespace BitmapToVectorImageConverter
 				// Join with prior arm chain
 
 				for (var j = 0; j < width; j++) {
-					if (currArms[j] != null) {
+					if (arms[i,j] != null) {
 
 						// połącz z prevArms[j]
 						// jeśli nie ma utwórz z false horizontal
 
-						if (prevArms [j] == null) {
-							prevArms [j] = createNode (i, j, getColor (data, i * row + 3 * j));
-							prevArms [j].mpArmVerticalVirtual = true;
-							prevArms [j].mpArmHorizontalVirtual = false;
+						if (arms[i-1,j] == null) {
+							arms[i-1,j] = createNode (i, j, getColor (data, i * row + 3 * j));
+							arms[i-1,j].mpArmVerticalVirtual = true;
+							arms[i-1,j].mpArmHorizontalVirtual = false;
 							// ale jeszcze trzeba je potem połączyć
+
+							// szukamy na lewo i na prawo sąsiada
+
+							int idx = j-1;
+
+							while (idx >= 0 && arms[i-1,idx] == null) {
+								idx--;
+							}
+
+							int left = idx;
+
+							// łączymy lewy z środkiem
+							// środek z prawym, albo nawet nie potrzebujemy
+							// bo jeśli jest połączony to już dobrze będzie,
+							// gdyż lewy to j praktycznie
+
+							if (left >= 0) {
+								arms [i - 1, j].mpLeftPolygon = arms [i, left].mpLeftPolygon;
+								arms [i - 1, j].mpInsidePolygon = arms [i, left].mpInsidePolygon;
+								arms [i - 1, j].mpAbovePolygon = arms [i, left].mpAbovePolygon;
+							}
+
 						}
 
 					}
 				}
-
-				var t = arms [i];
-
-				// currArms do prevArms
-				for (var j = 0; j < width; j++) {
-					arms [i, j] = currArms [j];
-				}
-
-				prevArms = copyCurrArms;
+					
 					
 			}
 
