@@ -218,7 +218,7 @@ namespace BitmapToVectorImageConverter
                 int currIdx = 3 * j;
                 int nextIdx = currIdx + 3;
                 var c = getColor(data, currIdx);
-                var c2 = getColor(data, nextIdx);
+                var c2 = getColor(data, nextIdx); // dla obrazka 1x1 mamy tutaj index out of range exception
 
                 if (c != c2 || j == 0 || j == width - 1)
                 {
@@ -347,8 +347,9 @@ namespace BitmapToVectorImageConverter
 
             }
 
-            ArmsProcessor processor = new ArmsProcessor();
-            processor.Process(arms);
+            // TODO: jest za mało pionowych arms, powinno być n + 1
+            ArmsProcessor processor = new ArmsProcessor(arms);
+            processor.Process();
 
             Marshal.Copy(data, 0, bmpData.Scan0, height * row);
 
