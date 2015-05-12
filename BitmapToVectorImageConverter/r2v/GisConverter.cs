@@ -218,7 +218,7 @@ namespace BitmapToVectorImageConverter
                 int currIdx = 3 * j;
                 int nextIdx = currIdx + 3;
                 var c = getColor(data, currIdx);
-                var c2 = getColor(data, nextIdx); // dla obrazka 1x1 mamy tutaj index out of range exception
+                var c2 = j < width - 1 ? getColor(data, nextIdx) : 0; // dla obrazka 1x1 mamy tutaj index out of range exception
 
                 if (c != c2 || j == 0 || j == width - 1)
                 {
