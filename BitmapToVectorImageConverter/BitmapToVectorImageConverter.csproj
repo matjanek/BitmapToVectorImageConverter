@@ -42,6 +42,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Svg">
+      <HintPath>..\packages\Svg.2.0.0\lib\Svg.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ImageComparison\ImageComparer.cs" />
@@ -84,6 +87,8 @@
     <Compile Include="r2v\GisChtArmR2V.cs" />
     <Compile Include="r2v\GisCsArc.cs" />
     <Compile Include="r2v\GisConverter.cs" />
+    <Compile Include="r2v\SvgTools.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
