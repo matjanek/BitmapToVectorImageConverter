@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BitmapToVectorImageConverter.ImageComparison;
 
 namespace BitmapToVectorImageConverter
 {
@@ -116,6 +117,23 @@ namespace BitmapToVectorImageConverter
                     outputPictureBoxLabel.ForeColor = Color.Red;
                 }
             }
+        }
+
+        private void compareButton_Click(object sender, EventArgs e)
+        {
+            ImageComparer IC = new ImageComparer(_inputImage, _vectorImageForComparison, _outputImage);
+            double percentageIV = IC.Compare(ImageComparisonPair.InputVector, ImageComparisonMethods.Percentage);
+            double percentageIO = IC.Compare(ImageComparisonPair.InputOutput, ImageComparisonMethods.Percentage);
+            double percentageVO = IC.Compare(ImageComparisonPair.VectorOutput, ImageComparisonMethods.Percentage);
+            percentageComparisonInputVectorLabel.Text = "Percentage comparison (input - vector): " + percentageIV;
+            percentageComparisonInputOutputLabel.Text = "Percentage comparison (input - output): " + percentageIO;
+            percentageComparisonVectorOutputLabel.Text = "Percentage comparison (vector - output): " + percentageVO;
+            double ssimIV = IC.Compare(ImageComparisonPair.InputVector, ImageComparisonMethods.SSIM);
+            double ssimIO = IC.Compare(ImageComparisonPair.InputOutput, ImageComparisonMethods.SSIM);
+            double ssimVO = IC.Compare(ImageComparisonPair.VectorOutput, ImageComparisonMethods.SSIM);
+            ssimComparisonInputVectorLabel.Text = "SSIM comparison (input - vector): " + ssimIV;
+            ssimComparisonInputOutputLabel.Text = "SSIM comparison (input - output): " + ssimIO;
+            ssimComparisonVectorOutputLabel.Text = "SSIM comparison (vector - output): " + ssimVO;
         }
     }
 }

@@ -45,10 +45,18 @@
             this.vectorImageForComparisonPictureBoxLabel = new System.Windows.Forms.Label();
             this.vectorImageForComparisonPictureBox = new System.Windows.Forms.PictureBox();
             this.openVectorImageForComparisonFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.percentageComparisonInputVectorLabel = new System.Windows.Forms.Label();
+            this.percentageComparisonInputOutputLabel = new System.Windows.Forms.Label();
+            this.percentageComparisonVectorOutputLabel = new System.Windows.Forms.Label();
+            this.compareButton = new System.Windows.Forms.Button();
+            this.ssimComparisonVectorOutputLabel = new System.Windows.Forms.Label();
+            this.ssimComparisonInputOutputLabel = new System.Windows.Forms.Label();
+            this.ssimComparisonInputVectorLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.inputPictureBox)).BeginInit();
             this.MenuStrip.SuspendLayout();
             this.algorithmPropertiesGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.outputPictureBox)).BeginInit();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vectorImageForComparisonPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -175,6 +183,13 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.ssimComparisonVectorOutputLabel);
+            this.groupBox1.Controls.Add(this.ssimComparisonInputOutputLabel);
+            this.groupBox1.Controls.Add(this.ssimComparisonInputVectorLabel);
+            this.groupBox1.Controls.Add(this.compareButton);
+            this.groupBox1.Controls.Add(this.percentageComparisonVectorOutputLabel);
+            this.groupBox1.Controls.Add(this.percentageComparisonInputOutputLabel);
+            this.groupBox1.Controls.Add(this.percentageComparisonInputVectorLabel);
             this.groupBox1.Location = new System.Drawing.Point(12, 363);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(960, 180);
@@ -208,11 +223,75 @@
             // 
             this.openVectorImageForComparisonFileDialog.Title = "Open vector image for comparison";
             // 
+            // percentageComparisonInputVectorLabel
+            // 
+            this.percentageComparisonInputVectorLabel.AutoSize = true;
+            this.percentageComparisonInputVectorLabel.Location = new System.Drawing.Point(7, 20);
+            this.percentageComparisonInputVectorLabel.Name = "percentageComparisonInputVectorLabel";
+            this.percentageComparisonInputVectorLabel.Size = new System.Drawing.Size(193, 13);
+            this.percentageComparisonInputVectorLabel.TabIndex = 0;
+            this.percentageComparisonInputVectorLabel.Text = "Percentage comparison (input - vector):";
+            // 
+            // percentageComparisonInputOutputLabel
+            // 
+            this.percentageComparisonInputOutputLabel.AutoSize = true;
+            this.percentageComparisonInputOutputLabel.Location = new System.Drawing.Point(7, 33);
+            this.percentageComparisonInputOutputLabel.Name = "percentageComparisonInputOutputLabel";
+            this.percentageComparisonInputOutputLabel.Size = new System.Drawing.Size(193, 13);
+            this.percentageComparisonInputOutputLabel.TabIndex = 1;
+            this.percentageComparisonInputOutputLabel.Text = "Percentage comparison (input - output):";
+            // 
+            // percentageComparisonVectorOutputLabel
+            // 
+            this.percentageComparisonVectorOutputLabel.AutoSize = true;
+            this.percentageComparisonVectorOutputLabel.Location = new System.Drawing.Point(7, 46);
+            this.percentageComparisonVectorOutputLabel.Name = "percentageComparisonVectorOutputLabel";
+            this.percentageComparisonVectorOutputLabel.Size = new System.Drawing.Size(200, 13);
+            this.percentageComparisonVectorOutputLabel.TabIndex = 2;
+            this.percentageComparisonVectorOutputLabel.Text = "Percentage comparison (vector - output):";
+            // 
+            // compareButton
+            // 
+            this.compareButton.Location = new System.Drawing.Point(443, 151);
+            this.compareButton.Name = "compareButton";
+            this.compareButton.Size = new System.Drawing.Size(75, 23);
+            this.compareButton.TabIndex = 3;
+            this.compareButton.Text = "Compare";
+            this.compareButton.UseVisualStyleBackColor = true;
+            this.compareButton.Click += new System.EventHandler(this.compareButton_Click);
+            // 
+            // ssimComparisonVectorOutputLabel
+            // 
+            this.ssimComparisonVectorOutputLabel.AutoSize = true;
+            this.ssimComparisonVectorOutputLabel.Location = new System.Drawing.Point(7, 85);
+            this.ssimComparisonVectorOutputLabel.Name = "ssimComparisonVectorOutputLabel";
+            this.ssimComparisonVectorOutputLabel.Size = new System.Drawing.Size(171, 13);
+            this.ssimComparisonVectorOutputLabel.TabIndex = 6;
+            this.ssimComparisonVectorOutputLabel.Text = "SSIM comparison (vector - output):";
+            // 
+            // ssimComparisonInputOutputLabel
+            // 
+            this.ssimComparisonInputOutputLabel.AutoSize = true;
+            this.ssimComparisonInputOutputLabel.Location = new System.Drawing.Point(7, 72);
+            this.ssimComparisonInputOutputLabel.Name = "ssimComparisonInputOutputLabel";
+            this.ssimComparisonInputOutputLabel.Size = new System.Drawing.Size(164, 13);
+            this.ssimComparisonInputOutputLabel.TabIndex = 5;
+            this.ssimComparisonInputOutputLabel.Text = "SSIM comparison (input - output):";
+            // 
+            // ssimComparisonInputVectorLabel
+            // 
+            this.ssimComparisonInputVectorLabel.AutoSize = true;
+            this.ssimComparisonInputVectorLabel.Location = new System.Drawing.Point(7, 59);
+            this.ssimComparisonInputVectorLabel.Name = "ssimComparisonInputVectorLabel";
+            this.ssimComparisonInputVectorLabel.Size = new System.Drawing.Size(164, 13);
+            this.ssimComparisonInputVectorLabel.TabIndex = 4;
+            this.ssimComparisonInputVectorLabel.Text = "SSIM comparison (input - vector):";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 661);
+            this.ClientSize = new System.Drawing.Size(984, 662);
             this.Controls.Add(this.algorithmPropertiesGroupBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.vectorImageForComparisonPictureBoxLabel);
@@ -230,6 +309,8 @@
             this.MenuStrip.PerformLayout();
             this.algorithmPropertiesGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.outputPictureBox)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vectorImageForComparisonPictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -255,6 +336,13 @@
         private System.Windows.Forms.PictureBox vectorImageForComparisonPictureBox;
         private System.Windows.Forms.ToolStripMenuItem openVectorImageForComparisonToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openVectorImageForComparisonFileDialog;
+        private System.Windows.Forms.Button compareButton;
+        private System.Windows.Forms.Label percentageComparisonVectorOutputLabel;
+        private System.Windows.Forms.Label percentageComparisonInputOutputLabel;
+        private System.Windows.Forms.Label percentageComparisonInputVectorLabel;
+        private System.Windows.Forms.Label ssimComparisonVectorOutputLabel;
+        private System.Windows.Forms.Label ssimComparisonInputOutputLabel;
+        private System.Windows.Forms.Label ssimComparisonInputVectorLabel;
     }
 }
 

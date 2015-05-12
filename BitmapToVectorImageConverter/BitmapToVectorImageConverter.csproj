@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageComparison\ImageComparer.cs" />
+    <Compile Include="ImageComparison\PercentageComparisonUtility.cs" />
+    <Compile Include="ImageComparison\SSIM.cs" />
     <Compile Include="ImageProcessor.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
