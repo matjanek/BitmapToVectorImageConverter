@@ -203,7 +203,7 @@ namespace BitmapToVectorImageConverter
             var width = bmpData.Width;
             Console.WriteLine("PixelFormat: {0}", bmpData.PixelFormat);
 
-            var arms = new GisChtArmR2V[height, width];
+            var arms = new GisChtArmR2V[height+1, width+1];
 
             Byte[] data = new Byte[height * bmpData.Stride];
             Marshal.Copy(bmpData.Scan0, data, 0, height * bmpData.Stride);
@@ -220,7 +220,7 @@ namespace BitmapToVectorImageConverter
                 var c = getColor(data, currIdx);
                 var c2 = j < width - 1 ? getColor(data, nextIdx) : 0; // dla obrazka 1x1 mamy tutaj index out of range exception
 
-                if (c != c2 || j == 0 || j == width - 1)
+                if (c != c2 || j == 0)
                 {
                     arms[0, j] = createNode(0, j, getColor(data, 3 * j));
                     arms[0, j].mpLeftPolygon = null;
@@ -230,7 +230,11 @@ namespace BitmapToVectorImageConverter
                 }
             }
 
-            arms[0, width - 1].mpArmHorizontalVirtual = true; // ostatnie poziome zawsze jest wirtualne
+            arms[0, width] = createNode(0, width, 0);
+            arms[0, width].mpLeftPolygon = null;
+            arms[0, width].mpAbovePolygon = null;
+            arms[0, width].mpArmVerticalVirtual = false;
+            arms[0, width].mpArmHorizontalVirtual = true; // ostatnie poziome zawsze jest wirtualne
 
             // dane o 1. linii dla 2. linii uzupełnione
 
@@ -244,8 +248,8 @@ namespace BitmapToVectorImageConverter
                     int bottomIdx = i * stride + 3 * j - row; // który to? chyba powyżej, a nie poniżej?
                     int nextIdx = currIdx + 3; // bajt na prawo
                     var c = getColor(data, currIdx);
-                    var c2 = getColor(data, nextIdx);
-                    var c3 = getColor(data, bottomIdx);
+                    var c2 = j < width - 1 ? getColor(data, nextIdx) : 0;
+                    var c3 = i < height - 1 ? getColor(data, bottomIdx) : 0;
 
                     if (c != c2) // jest zmiana koloru, tworzymy ramię
                     {
@@ -257,27 +261,21 @@ namespace BitmapToVectorImageConverter
                         arms[i, j].mpArmHorizontalVirtual = c == c3; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
                         arms[i, j].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
                     }
+
                 }
 
                 // ostatnia i przedostatnia kolumna // chyba chodzi o pierwszą i ostatnią
 
-                int c0 = getColor(data, i * row);
-                int c0p = getColor(data, (i - 1) * row); // poniżej w pierwszej kolumnie (?)
-
-                arms[i, 0] = createNode(i, 0, c0);
-                arms[i, 0].mpArmHorizontalVirtual = c0 != c0p;
-                arms[i, 0].mpArmVerticalVirtual = false;
-
-                arms[i, width - 1] = createNode(i, width - 1, getColor(data, 3 * (width - 1)));
-                arms[i, width - 1].mpArmHorizontalVirtual = true; // ostatnie poziome w wierszu jest zawsze wirtualne
-                arms[i, width - 1].mpArmVerticalVirtual = false; // zamykamy ramieniem pionowym
+                arms[i, width] = createNode(i, width, 0); // arms dla (i, j) - piksela
+                arms[i, width].mpArmHorizontalVirtual = true; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
+                arms[i, width].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
 
                 // na początku i na końcu zawsze musi być
 
                 var copyCurrArms = new GisChtArmR2V[width];
 
                 // dziedziczymy z poprzedniej linii
-                for (var j = 0; j < width; j++)
+                for (var j = 0; j < width+1; j++)
                 {
                     if (arms[i, j] == null && arms[i - 1, j] != null)
                     {
@@ -290,7 +288,7 @@ namespace BitmapToVectorImageConverter
                 var last = 0;
 
                 // krok (e): Add Extra Two-Arm Chains based on prior line
-                for (var j = 1; j < width; j++)
+                for (var j = 1; j < width+1; j++)
                 {
                     if (arms[i, j] != null)
                     {
@@ -301,7 +299,7 @@ namespace BitmapToVectorImageConverter
 
                 // Join with prior arm chain
 
-                for (var j = 0; j < width; j++)
+                for (var j = 0; j < width+1; j++)
                 {
                     if (arms[i, j] != null)
                     {
@@ -311,7 +309,8 @@ namespace BitmapToVectorImageConverter
 
                         if (arms[i - 1, j] == null)
                         {
-                            arms[i - 1, j] = createNode(i, j, getColor(data, i * row + 3 * j)); // czy to na pewno dobry kolor? Czemu nie (i-1) * row?
+                            int c = j < width ? getColor(data,i * row + 3 * j) : 0;
+                            arms[i - 1, j] = createNode(i, j, c); // czy to na pewno dobry kolor? Czemu nie (i-1) * row?
                             arms[i - 1, j].mpArmVerticalVirtual = true;
                             arms[i - 1, j].mpArmHorizontalVirtual = false;
                             // ale jeszcze trzeba je potem połączyć
@@ -346,6 +345,16 @@ namespace BitmapToVectorImageConverter
 
 
             }
+
+            for (var j = 0; j < width+1; j++) {
+                arms[height, j] = createNode(0, j, 0);
+                arms[height, j].mpLeftPolygon = null;
+                arms[height, j].mpAbovePolygon = null;
+                arms[height, j].mpArmVerticalVirtual = false;
+                arms[height, j].mpArmHorizontalVirtual = false;
+            }
+
+            arms[height, width].mpArmHorizontalVirtual = true;
 
             // TODO: jest za mało pionowych arms, powinno być n + 1
             ArmsProcessor processor = new ArmsProcessor(arms);
