@@ -157,8 +157,8 @@ namespace BitmapToVectorImageConverter
         {
             return new GisChtArmR2V()
             {
-                x = j,
-                y = i,
+                X = j,
+                Y = i,
                 mpAbovePolygon = new GisPolygonR2V(),
                 mlColPos = j,
                 mpLeftPolygon = new GisPolygonR2V(),
@@ -183,8 +183,8 @@ namespace BitmapToVectorImageConverter
             var result = new GisChtArmR2V();
             result.mlColPos = item.mlColPos;
             result.mPixelValue = item.mPixelValue; // czy na pewno?
-            result.x = item.x;
-            result.y = item.y; // chyba nie, jesteśmy rząd niżej
+            result.X = item.X;
+            result.Y = item.Y; // chyba nie, jesteśmy rząd niżej
             result.mpArmHorizontalVirtual = false; // czy zawsze?
             result.mpArmVerticalVirtual = true;
             return result;
@@ -218,7 +218,7 @@ namespace BitmapToVectorImageConverter
                 int currIdx = 3 * j;
                 int nextIdx = currIdx + 3;
                 var c = getColor(data, currIdx);
-                var c2 = getColor(data, nextIdx);
+                var c2 = getColor(data, nextIdx); // dla obrazka 1x1 mamy tutaj index out of range exception
 
                 if (c != c2 || j == 0 || j == width - 1)
                 {
@@ -346,6 +346,10 @@ namespace BitmapToVectorImageConverter
 
 
             }
+
+            // TODO: jest za mało pionowych arms, powinno być n + 1
+            ArmsProcessor processor = new ArmsProcessor(arms);
+            processor.Process();
 
             Marshal.Copy(data, 0, bmpData.Scan0, height * row);
 
