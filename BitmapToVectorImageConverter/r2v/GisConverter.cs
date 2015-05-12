@@ -19,7 +19,7 @@ namespace BitmapToVectorImageConverter
         {
             var nextArm = arms[i, next];
             var prevArm = arms[i, prev];
-            var upperArm = arms[i - 1, next];
+            var upperArm = i > 0 ? arms[i - 1, next] : null;
 
             if (upperArm == null)
             {
@@ -204,7 +204,7 @@ namespace BitmapToVectorImageConverter
             Console.WriteLine("PixelFormat: {0}", bmpData.PixelFormat);
 
             var arms = new GisChtArmR2V[height+1, width+1];
-
+            int last = 0;
             Byte[] data = new Byte[height * bmpData.Stride];
             Marshal.Copy(bmpData.Scan0, data, 0, height * bmpData.Stride);
             int stride = bmpData.Stride;
@@ -223,7 +223,6 @@ namespace BitmapToVectorImageConverter
                 if (c != c2 || j == 0)
                 {
                     arms[0, j] = createNode(0, j, getColor(data, 3 * j));
-                    arms[0, j].mpLeftPolygon = null;
                     arms[0, j].mpAbovePolygon = null;
                     arms[0, j].mpArmVerticalVirtual = false;
                     arms[0, j].mpArmHorizontalVirtual = false;
@@ -231,10 +230,19 @@ namespace BitmapToVectorImageConverter
             }
 
             arms[0, width] = createNode(0, width, 0);
-            arms[0, width].mpLeftPolygon = null;
             arms[0, width].mpAbovePolygon = null;
             arms[0, width].mpArmVerticalVirtual = false;
             arms[0, width].mpArmHorizontalVirtual = true; // ostatnie poziome zawsze jest wirtualne
+
+            // krok (e): Add Extra Two-Arm Chains based on prior line
+            for (var j = 1; j < width + 1; j++)
+            {
+                if (arms[0, j] != null)
+                {
+                    connectTwoArcs(0, last, j, arms);
+                    last = j;
+                }
+            }
 
             // dane o 1. linii dla 2. linii uzupełnione
 
@@ -242,7 +250,7 @@ namespace BitmapToVectorImageConverter
 
             for (var i = 1; i < height; i++)
             { // 2 linie bufor. Badamy wiersze i-ty oraz (i-1)-wszy
-                for (var j = 1; j < width - 1; j++)
+                for (var j = 0; j < width; j++)
                 {
                     int currIdx = i * stride + 3 * j; // indeks bajtu, który nas interesuje
                     int bottomIdx = i * stride + 3 * j - row; // który to? chyba powyżej, a nie poniżej?
@@ -270,6 +278,7 @@ namespace BitmapToVectorImageConverter
                 arms[i, width].mpArmHorizontalVirtual = true; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
                 arms[i, width].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
 
+
                 // na początku i na końcu zawsze musi być
 
                 var copyCurrArms = new GisChtArmR2V[width];
@@ -285,7 +294,7 @@ namespace BitmapToVectorImageConverter
 
                 // Two Arm Chain creating
 
-                var last = 0;
+                last = 0;
 
                 // krok (e): Add Extra Two-Arm Chains based on prior line
                 for (var j = 1; j < width+1; j++)
@@ -346,15 +355,26 @@ namespace BitmapToVectorImageConverter
 
             }
 
+
             for (var j = 0; j < width+1; j++) {
                 arms[height, j] = createNode(0, j, 0);
-                arms[height, j].mpLeftPolygon = null;
-                arms[height, j].mpAbovePolygon = null;
                 arms[height, j].mpArmVerticalVirtual = false;
                 arms[height, j].mpArmHorizontalVirtual = false;
             }
 
             arms[height, width].mpArmHorizontalVirtual = true;
+
+            last = 0;
+
+            // krok (e): Add Extra Two-Arm Chains based on prior line
+            for (var j = 1; j < width + 1; j++)
+            {
+                if (arms[height, j] != null)
+                {
+                    connectTwoArcs(height, last, j, arms);
+                    last = j;
+                }
+            }
 
             // TODO: jest za mało pionowych arms, powinno być n + 1
             ArmsProcessor processor = new ArmsProcessor(arms);
