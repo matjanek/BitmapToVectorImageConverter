@@ -8,6 +8,7 @@ namespace BitmapToVectorImageConverter
 {
     public class GisConverter
     {
+        private const int BPP = 4;
         private GisConverter()
         {
         }
@@ -167,14 +168,14 @@ namespace BitmapToVectorImageConverter
             return c;
         }
 
-        static GisChtArmR2V smartCopy(GisChtArmR2V item)
+        static GisChtArmR2V smartCopy(GisChtArmR2V item, int x, int y)
         {
             var result = new GisChtArmR2V();
             result.mlColPos = item.mlColPos;
             result.mPixelValue = item.mPixelValue; // czy na pewno?
-            result.X = item.X;
-            result.Y = item.Y; // chyba nie, jesteśmy rząd niżej
-            result.mpArmHorizontalVirtual = false; // czy zawsze?
+            result.X = x;
+            result.Y = y; // chyba nie, jesteśmy rząd niżej
+            result.mpArmHorizontalVirtual = false; //TODO: zweryfikować // czy zawsze?
             result.mpArmVerticalVirtual = true;
             return result;
         }
@@ -187,7 +188,6 @@ namespace BitmapToVectorImageConverter
             var bmpData = bmp.LockBits(rect,
                 System.Drawing.Imaging.ImageLockMode.ReadWrite,
                 System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            var row = bmpData.Stride;
             var height = bmpData.Height;
             var width = bmpData.Width;
             Console.WriteLine("PixelFormat: {0}", bmpData.PixelFormat);
@@ -196,22 +196,21 @@ namespace BitmapToVectorImageConverter
             int last = 0;
             Byte[] data = new Byte[height * bmpData.Stride];
             Marshal.Copy(bmpData.Scan0, data, 0, height * bmpData.Stride);
-            int stride = bmpData.Stride;
+            int row = bmpData.Stride;
 
             // dla 1 linii całość wypełniona
             // wykrywanie różnic w 1. linii, konieczne dla 2. linii (w prevArms)
 
             for (var j = 0; j < width; j++)
             {
-
-                int currIdx = 3 * j;
-                int nextIdx = currIdx + 3;
+                int currIdx = BPP * j;
+                int nextIdx = currIdx + BPP;
                 var c = getColor(data, currIdx);
                 var c2 = j < width - 1 ? getColor(data, nextIdx) : 0; // dla obrazka 1x1 mamy tutaj index out of range exception
 
                 if (c != c2 || j == 0)
                 {
-                    arms[0, j] = new GisChtArmR2V(false, false, 0, j, getColor(data, 3 * j));
+                    arms[0, j] = new GisChtArmR2V(false, false, 0, j, getColor(data, BPP * j));
                 }
             }
 
@@ -229,18 +228,18 @@ namespace BitmapToVectorImageConverter
 
             // dane o 1. linii dla 2. linii uzupełnione
 
-            Console.Error.WriteLine("Stride: {0}", stride);
+            Console.Error.WriteLine("Stride: {0}", bmpData.Stride);
 
             for (var i = 1; i < height; i++)
             { // 2 linie bufor. Badamy wiersze i-ty oraz (i-1)-wszy
                 for (var j = 0; j < width; j++)
                 {
-                    int currIdx = i * stride + 3 * j; // indeks bajtu, który nas interesuje
-                    int bottomIdx = i * stride + 3 * j - row; // który to? chyba powyżej, a nie poniżej?
-                    int nextIdx = currIdx + 3; // bajt na prawo
+                    int currIdx = i * bmpData.Stride + BPP * j; // indeks bajtu, który nas interesuje
+                    int bottomIdx = (i - 1) * bmpData.Stride + BPP * j; // który to? chyba powyżej, a nie poniżej?
+                    int nextIdx = currIdx + BPP; // bajt na prawo
                     var c = getColor(data, currIdx);
-                    var c2 = j < width - 1 ? getColor(data, nextIdx) : 0;
-                    var c3 = i < height - 1 ? getColor(data, bottomIdx) : 0;
+                    var c2 = j < width - 1? getColor(data, nextIdx) : 0;
+                    var c3 = getColor(data, bottomIdx);
 
                     if (c != c2) // jest zmiana koloru, tworzymy ramię
                     {
@@ -248,19 +247,14 @@ namespace BitmapToVectorImageConverter
                             i, j, c, c2);
 
                         // tworzymy instancję "ramion"
-                        arms[i, j] = new GisChtArmR2V(false, c == c3, i, j, c);
-                        //arms[i, j] = createNode(i, j, c); // arms dla (i, j) - piksela
-                        //arms[i, j].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
-                        //arms[i, j].mpArmHorizontalVirtual = c == c3; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne                        
+                        arms[i, j] = new GisChtArmR2V(false, c == c3, i, j, c);    // TODO: tu jest bug przy obrazie 1x2, ramię poziome powinno być wirtualne.               
                     }
-
                 }
 
                 // ostatnia i przedostatnia kolumna // chyba chodzi o pierwszą i ostatnią
 
-                arms[i, width] = new GisChtArmR2V(true, false, i, width, 0); // arms dla (i, j) - piksela
-                //arms[i, width].mpArmHorizontalVirtual = true; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
-                //arms[i, width].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
+                arms[i, width] = new GisChtArmR2V(false, true, i, width, 0); // arms dla (i, j) - piksela
+
 
                 // na początku i na końcu zawsze musi być
 
@@ -271,7 +265,7 @@ namespace BitmapToVectorImageConverter
                 {
                     if (arms[i, j] == null && arms[i - 1, j] != null)
                     {
-                        arms[i, j] = smartCopy(arms[i - 1, j]);
+                        arms[i, j] = smartCopy(arms[i - 1, j], j, i);
                     }
                 }
 
@@ -301,12 +295,8 @@ namespace BitmapToVectorImageConverter
 
                         if (arms[i - 1, j] == null)
                         {
-                            int c = j < width ? getColor(data,i * row + 3 * j) : 0;
+                            int c = j < width ? getColor(data, i * bmpData.Stride + BPP * j) : 0;
                             arms[i - 1, j] = new GisChtArmR2V(true, false, i, j, c);
-                            //arms[i - 1, j] = createNode(i, j, c); // czy to na pewno dobry kolor? Czemu nie (i-1) * row?
-                            //arms[i - 1, j].mpArmVerticalVirtual = true;
-                            //arms[i - 1, j].mpArmHorizontalVirtual = false;
-                            // ale jeszcze trzeba je potem połączyć
 
                             // szukamy na lewo i na prawo sąsiada
 
@@ -342,8 +332,6 @@ namespace BitmapToVectorImageConverter
 
             for (var j = 0; j < width+1; j++) {
                 arms[height, j] = new GisChtArmR2V(true, false, 0, j, 0);
-                //arms[height, j].mpArmVerticalVirtual = true;
-                //arms[height, j].mpArmHorizontalVirtual = false;
             }
 
             arms[height, width].mpArmHorizontalVirtual = true;
@@ -364,7 +352,7 @@ namespace BitmapToVectorImageConverter
             ArmsProcessor processor = new ArmsProcessor(arms);
             processor.Process();
 
-            Marshal.Copy(data, 0, bmpData.Scan0, height * row);
+            Marshal.Copy(data, 0, bmpData.Scan0, height * bmpData.Stride);
 
             bmp.UnlockBits(bmpData);
 

@@ -36,7 +36,8 @@ namespace BitmapToVectorImageConverter
                 if (arms[i - 1, j] != null)
                 {
                     neighbors.Add(arms[i - 1, j].mpInsidePolygon);
-                    neighbors.Add(arms[i - 1, j].mpAbovePolygon); //  co zrobić z polygonami "poza obrazem"? ignorować, dodawać...?
+                    neighbors.Add(arms[i - 1, j].mpAbovePolygon);
+                    neighbors.Add(arms[i - 1, j].mpLeftPolygon);
                 }
             }
             
@@ -45,6 +46,7 @@ namespace BitmapToVectorImageConverter
                 if (arms[i, j - 1] != null)
                 {
                     neighbors.Add(arms[i, j - 1].mpInsidePolygon);
+                    neighbors.Add(arms[i, j - 1].mpAbovePolygon);
                 }
             }
 
