@@ -23,7 +23,7 @@ namespace BitmapToVectorImageConverter
 
             if (upperArm == null)
             {
-                upperArm = prevArm;
+          //      upperArm = prevArm; // to chyba jest błąd (nie zawsze, ale są przypadki, gdzie wprowadza błąd)
             }
 
             bool upperSolid = upperArm != null ? !upperArm.mpArmVerticalVirtual : false;
@@ -57,7 +57,7 @@ namespace BitmapToVectorImageConverter
             switch (caseNr)
             {
                 case 0:
-                    nextArm.mpAbovePolygon = upperArm.mpInsidePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Inside);
                     nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
                     // nextArm.mpInsidePolygon = swój własny
                     break;
@@ -67,7 +67,7 @@ namespace BitmapToVectorImageConverter
                     // nextArm.mpInsidePolygon = swój własny
                     break;
                 case 2:
-                    nextArm.mpAbovePolygon = upperArm.mpInsidePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Inside);
                     nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
                     // nextArm.mpInsidePolygon = swój własny
                     break;
@@ -77,9 +77,9 @@ namespace BitmapToVectorImageConverter
                     // nextArm.mpInsidePolygon = swój własny
                     break;
                 case 4: // prawy
-                    nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Above);
                     nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpInsidePolygon = upperArm.mpInsidePolygon;
+                    nextArm.mpInsidePolygon = SafeGetPolygon(upperArm, PolyLocation.Inside);
                     break;
                 case 5: // lewy	
                     nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
@@ -88,18 +88,19 @@ namespace BitmapToVectorImageConverter
                     break;
                 case 6:
                     nextArm.mpLeftPolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpInsidePolygon = upperArm.mpInsidePolygon;
-                    nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
+                    nextArm.mpInsidePolygon = SafeGetPolygon(upperArm, PolyLocation.Inside);
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Above);
                     break;
                 case 7:
+                    throw new Exception("Unexpected case occurred");
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Above);
                     break;
                 case 8:
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Above);
                     break;
                 case 9:
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
@@ -109,9 +110,10 @@ namespace BitmapToVectorImageConverter
                 case 10:
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpAbovePolygon = upperArm.mpInsidePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Inside);
                     break;
                 case 11:
+                    throw new Exception("Unexpected case occurred");
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
                     nextArm.mpAbovePolygon = prevArm.mpInsidePolygon;
@@ -119,19 +121,22 @@ namespace BitmapToVectorImageConverter
                 case 12:
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Above); // zmieniłem z prevarm.mpAbove
                     break;
                 case 13:
+                    throw new Exception("Unexpected case occurred");
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
-                    nextArm.mpAbovePolygon = upperArm.mpAbovePolygon;
+                    nextArm.mpAbovePolygon = SafeGetPolygon(upperArm, PolyLocation.Above);
                     break;
                 case 14:
+                    throw new Exception("Unexpected case occurred");
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
                     nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
                     break;
                 case 15:
+                    throw new Exception("Unexpected case occurred");
                     nextArm.mpLeftPolygon = prevArm.mpLeftPolygon;
                     nextArm.mpInsidePolygon = prevArm.mpInsidePolygon;
                     nextArm.mpAbovePolygon = prevArm.mpAbovePolygon;
@@ -222,17 +227,11 @@ namespace BitmapToVectorImageConverter
 
                 if (c != c2 || j == 0)
                 {
-                    arms[0, j] = createNode(0, j, getColor(data, 3 * j));
-                    arms[0, j].mpAbovePolygon = null;
-                    arms[0, j].mpArmVerticalVirtual = false;
-                    arms[0, j].mpArmHorizontalVirtual = false;
+                    arms[0, j] = new GisChtArmR2V(false, false, 0, j, getColor(data, 3 * j));
                 }
             }
 
-            arms[0, width] = createNode(0, width, 0);
-            arms[0, width].mpAbovePolygon = null;
-            arms[0, width].mpArmVerticalVirtual = false;
-            arms[0, width].mpArmHorizontalVirtual = true; // ostatnie poziome zawsze jest wirtualne
+            arms[0, width] = new GisChtArmR2V(false, true,0, width, 0);
 
             // krok (e): Add Extra Two-Arm Chains based on prior line
             for (var j = 1; j < width + 1; j++)
@@ -265,19 +264,19 @@ namespace BitmapToVectorImageConverter
                             i, j, c, c2);
 
                         // tworzymy instancję "ramion"
-                        arms[i, j] = createNode(i, j, c); // arms dla (i, j) - piksela
-                        arms[i, j].mpArmHorizontalVirtual = c == c3; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
-                        arms[i, j].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
+                        arms[i, j] = new GisChtArmR2V(false, c == c3, i, j, c);
+                        //arms[i, j] = createNode(i, j, c); // arms dla (i, j) - piksela
+                        //arms[i, j].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
+                        //arms[i, j].mpArmHorizontalVirtual = c == c3; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne                        
                     }
 
                 }
 
                 // ostatnia i przedostatnia kolumna // chyba chodzi o pierwszą i ostatnią
 
-                arms[i, width] = createNode(i, width, 0); // arms dla (i, j) - piksela
-                arms[i, width].mpArmHorizontalVirtual = true; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
-                arms[i, width].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
-
+                arms[i, width] = new GisChtArmR2V(true, false, i, width, 0); // arms dla (i, j) - piksela
+                //arms[i, width].mpArmHorizontalVirtual = true; // jeżeli górny piksel jest taki sam, jak dolny, to ramię poziome jest wirtualne
+                //arms[i, width].mpArmVerticalVirtual = false; // pionowe nie jest wirtualne z definicji, bo c != c2
 
                 // na początku i na końcu zawsze musi być
 
@@ -319,9 +318,10 @@ namespace BitmapToVectorImageConverter
                         if (arms[i - 1, j] == null)
                         {
                             int c = j < width ? getColor(data,i * row + 3 * j) : 0;
-                            arms[i - 1, j] = createNode(i, j, c); // czy to na pewno dobry kolor? Czemu nie (i-1) * row?
-                            arms[i - 1, j].mpArmVerticalVirtual = true;
-                            arms[i - 1, j].mpArmHorizontalVirtual = false;
+                            arms[i - 1, j] = new GisChtArmR2V(true, false, i, j, c);
+                            //arms[i - 1, j] = createNode(i, j, c); // czy to na pewno dobry kolor? Czemu nie (i-1) * row?
+                            //arms[i - 1, j].mpArmVerticalVirtual = true;
+                            //arms[i - 1, j].mpArmHorizontalVirtual = false;
                             // ale jeszcze trzeba je potem połączyć
 
                             // szukamy na lewo i na prawo sąsiada
@@ -353,13 +353,13 @@ namespace BitmapToVectorImageConverter
                 }
 
 
-            }
+            } // main row-by-row loop
 
 
             for (var j = 0; j < width+1; j++) {
-                arms[height, j] = createNode(0, j, 0);
-                arms[height, j].mpArmVerticalVirtual = false;
-                arms[height, j].mpArmHorizontalVirtual = false;
+                arms[height, j] = new GisChtArmR2V(true, false, 0, j, 0);
+                //arms[height, j].mpArmVerticalVirtual = true;
+                //arms[height, j].mpArmHorizontalVirtual = false;
             }
 
             arms[height, width].mpArmHorizontalVirtual = true;
@@ -389,6 +389,28 @@ namespace BitmapToVectorImageConverter
             return "";
         }
 
+        private static GisPolygonR2V SafeGetPolygon(GisChtArmR2V arm, PolyLocation location)
+        {
+            if (arm == null) { return null; }
+            switch(location)
+            {
+                case PolyLocation.Above:
+                    return arm.mpAbovePolygon;
+                case PolyLocation.Inside:
+                    return arm.mpInsidePolygon;
+                case PolyLocation.Left:
+                    return arm.mpLeftPolygon;
+                default:
+                    throw new ArgumentException("unknown location");
+            }
+        }
+
+        private enum PolyLocation
+        {
+            Inside, 
+            Above,
+            Left,
+        }
     }
 }
 

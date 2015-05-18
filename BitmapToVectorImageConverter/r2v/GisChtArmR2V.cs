@@ -16,6 +16,21 @@ namespace BitmapToVectorImageConverter
 		public GisChtArmR2V ()
 		{	
 		}
+
+        public GisChtArmR2V(bool verticalVirtual, bool horizontalVirtual, int i, int j, int c)
+        {
+            X = j;
+            Y = i;
+            mpAbovePolygon = null;
+            mlColPos = j;
+            mpLeftPolygon = null;
+            mpArmVerticalVirtual = verticalVirtual;
+            mpArmHorizontalVirtual = horizontalVirtual;
+            mpInsidePolygon = (!verticalVirtual && !horizontalVirtual)? new GisPolygonR2V() : null;
+            mPixelValue = c;
+            mpArcVerticalArm = new GisCsArc();
+            mpArcHorizontalArm = new GisCsArc();
+        }
 	}
 }
 
