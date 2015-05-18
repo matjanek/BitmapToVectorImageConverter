@@ -158,22 +158,6 @@ namespace BitmapToVectorImageConverter
 
         }
 
-        static GisChtArmR2V createNode(int i, int j, int c)
-        {
-            return new GisChtArmR2V()
-            {
-                X = j,
-                Y = i,
-                mpAbovePolygon = new GisPolygonR2V(),
-                mlColPos = j,
-                mpLeftPolygon = new GisPolygonR2V(),
-                mpInsidePolygon = new GisPolygonR2V(),
-                mPixelValue = c,
-                mpArcVerticalArm = new GisCsArc(),
-                mpArcHorizontalArm = new GisCsArc()
-            };
-        }
-
         static int getColor(byte[] data, int currIdx)
         {
             byte b = data[currIdx];
