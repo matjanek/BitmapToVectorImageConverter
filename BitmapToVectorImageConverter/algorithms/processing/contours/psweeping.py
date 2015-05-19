@@ -268,8 +268,40 @@ def p2l_distance(ax, ay, bx, by, cx, cy):
     dist = Sqrt(r1*r1-s*s)
     return dist
 
-def contours_simplification(slines, eps):
-    pass
+def contours_simplifications(slines, eps):
+    slines2 = {}
+    for (seg,sline) in slines.items():
+        c = curve_simplification(sline, eps)
+        slines2[seg] = c
+    return slines2
 
-def curves_simplifications(slines, eps):
-    pass
+def curve_simplification(sline, eps):
+    n  = len(sline)
+    if n < 2:
+        return sline
+
+    p1 = (p1y,p1x) = sline[0]
+    p2 = (p2y,p2x) = sline[n-1]
+
+    dMaxIdx = -1
+    dMax = -1.0
+
+    for i in range(1, n-1):
+        (cy, cx) = sline[i]
+        d = p2l_distance(p1x, p1y, p2x,p2y, cx,cy)
+        if d > dMax:
+            dMax = d
+            dMaxIdx = i
+
+    if dMax > eps:
+        c1 = curve_simplification(sline[0:dMaxIdx+1],eps)
+        c2 = curve_simplification(sline[dMaxIdx:n],eps)
+
+        nc1 = len(c1)
+        nc2 = len(c2)
+        return c1[0:(nc1-1)] + c2
+    else:
+        return [p1,p2]
+
+
+

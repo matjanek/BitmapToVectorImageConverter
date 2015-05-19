@@ -121,7 +121,8 @@ save_color("csegments2.png", csegments2, width, height, stride)
 cmask = detect_contours(segments2, None)
 cmaskImg = m.Clone()
 clines = calculate_contour_lines(segments2, cmask)
-slines = detect_border_points(segments2, cmask, clines)
+slines = contours_simplifications(clines, 5)
+# slines = detect_border_points(segments2, cmask, clines)
 
 print ("Clines: {}".format(clines))
 

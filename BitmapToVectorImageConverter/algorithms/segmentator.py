@@ -46,8 +46,8 @@ print("[{}] Calculating segments' parameters ...".format(datetime.now()))
 cmask = detect_contours(segments, None)
 cmaskImg = m.Clone()
 clines = calculate_contour_lines(segments, cmask)
-slines = detect_border_points(segments, cmask, clines)
-
+# slines = detect_border_points(segments, cmask, clines)
+slines = contours_simplifications(clines, 3)
 
 c = Array.CreateInstance(Byte, 3)
 c[0] = Byte(0)
