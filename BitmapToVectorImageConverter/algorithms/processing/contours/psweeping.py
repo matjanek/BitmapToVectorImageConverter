@@ -271,7 +271,27 @@ def p2l_distance(ax, ay, bx, by, cx, cy):
 def contours_simplifications(slines, eps):
     slines2 = {}
     for (seg,sline) in slines.items():
-        c = curve_simplification(sline, eps)
+        n = len(sline)
+        # głupie x^2 , ale nie zostawia wrednych durnych punktów
+        # FIXME wydajność
+        mDist = -1
+        mi = -1
+        mj = -1
+        for i in range(0, n):
+            for j in range(0, i):
+                (p1y, p1x) = sline[i]
+                (p2y, p2x) = sline[j]
+                d = p2p_distance(p1x, p1y, p2x, p2y)
+                if d > mDist:
+                    mDist = d
+                    mi = i
+                    mj = j
+        l1 = sline[j:i+1]
+        l2 = sline[i:n] + sline[0:j+1]
+        c1 = curve_simplification(l1, eps)
+        c2 = curve_simplification(l2, eps)
+        nc1 = len(c1)
+        c = c1[0:(nc1-1)]+c2
         slines2[seg] = c
     return slines2
 
