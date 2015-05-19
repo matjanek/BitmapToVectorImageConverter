@@ -252,3 +252,24 @@ def detect_border_points(segments, cmask, slines, window = 50):
             spoints[seg] = points
 
     return spoints
+
+def p2p_distance(ax, ay, bx, by):
+    dx = ax-bx
+    dy = ay-by
+    return Sqrt(dx*dx+dy*dy)
+
+def p2l_distance(ax, ay, bx, by, cx, cy):
+    # c to punkt
+    # a, b linia
+    r1   = p2p_distance(ax, ay, cx, cy)
+    r2   = p2p_distance(bx, by, cx, cy)
+    d    = p2p_distance(ax, ay, bx, by)
+    s    = (r1*r1 - r2*r2 + d*d) / (2*d)
+    dist = Sqrt(r1*r1-s*s)
+    return dist
+
+def contours_simplification(slines, eps):
+    pass
+
+def curves_simplifications(slines, eps):
+    pass

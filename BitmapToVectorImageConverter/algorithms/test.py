@@ -8,5 +8,8 @@ from System.Drawing import *
 from System.Drawing.Imaging import *
 
 from utils import *
-res = shoeShape(Bitmap("image2.jpg"))
-res.Save("test.png")
+from processing.contours.psweeping import *
+
+dist = p2l_distance(0.0, 0.0, 10.0, 20.0, 5.0, 111.0)
+print ("Distance: {}".format(dist))
+
