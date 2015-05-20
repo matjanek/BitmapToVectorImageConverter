@@ -11,6 +11,7 @@ def check_for_circle(segments, cmask, cline, sline, info, window = 3, minSize = 
     (fy,fx) = cline[0]
     (counts,xmins, xmaxs, ymins, ymaxs, meansx, meansy) = info
     seg = segments[fy,fx]
+
     if counts[seg] < minSize:
         return False
 
@@ -35,9 +36,45 @@ def check_for_circle(segments, cmask, cline, sline, info, window = 3, minSize = 
 
     return (maxDist - minDist) <= window
 
+def check_for_line(segments, cmask, cline, sline, info, window = 5, minSize = 20):
+    (counts, xmins, xmaxs, ymins, ymaxs, meansx, meansy) = info
+    (py,px) = cline[0]
+    seg = segments[py,px]
+    if counts[seg] < minSize:
+        return False
+
+    xmin = xmins[seg]
+    ymin = ymins[seg]
+    xmax = xmaxs[seg]
+    ymax = ymaxs[seg]
+
+    cyMax = 0
+    for i in range(ymin, ymax+1):
+        c = 0
+        for j in range(xmin, xmax+1):
+            if segments[i,j] == seg:
+                c += 1
+
+        if c > cyMax:
+            cyMax = c
+
+    cxMax = 0
+    for j in range(xmin, xmax+1):
+        c = 0
+        for i in range(ymin, ymax+1):
+            if segments[i,j] == seg:
+                c += 1
+
+        if c > cxMax:
+            cxMax = c
+
+    return cyMax <= window or cxMax <= window
+
 def classificate_shape(segments, cmask, cline, sline, info):
     if check_for_circle(segments, cmask, cline, sline, info):
         print ("Circle detected")
+    elif check_for_line(segments, cmask, cline, sline, info):
+        print ("Line detected")
 
     vertices = []
     for (py,px) in sline:

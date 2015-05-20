@@ -39,7 +39,7 @@ mGray = color2gray(m)
 print("[{}] Calculating segments in otsu mask...".format(datetime.now()))
 (segments,colors) = calculate_connected_parts(mGray)
 # selmask = select_segment(segments, 200) # koło
-selmask = select_segment(segments, 609)
+selmask = select_segment(segments, 2)
 
 
 print("[{}] Calculating segments' parameters ...".format(datetime.now()))
