@@ -17,6 +17,7 @@ from datetime import datetime
 from processing.shoes.shape import *
 from processing.masks import *
 from processing.contours.psweeping import *
+from processing.classification.shapes import *
 
 if len(sys.argv) <= 1:
 	print("Too small arguments...")
@@ -47,7 +48,8 @@ cmask = detect_contours(segments, None)
 cmaskImg = m.Clone()
 clines = calculate_contour_lines(segments, cmask)
 # slines = detect_border_points(segments, cmask, clines)
-slines = contours_simplifications(clines, 3)
+slines = contours_simplifications(clines, 4)
+classification = classificate_shapes(segments, None, slines)
 
 c = Array.CreateInstance(Byte, 3)
 c[0] = Byte(0)
@@ -69,7 +71,7 @@ for seg in slines.keys():
         print ("c: ({},{}) -> n: ({},{})".format(cx, cy, nx, ny))
         drawLine2(cmaskImg, c, cx, cy, nx, ny)
 
-#        markPixel(cmaskImg, c2, cx, cy)
+        markPixel(cmaskImg, c2, cx, cy)
 #        markPixel(cmaskImg, c2, nx, ny)
 
 for seg in meansx.keys():

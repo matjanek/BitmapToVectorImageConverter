@@ -18,33 +18,6 @@ from processing.masks import *
 from processing.contours.psweeping import *
 
 
-class shape:
-	pass
-
-class point:
-	def __init__(self,x,y):
-		self.x = x
-		self.y = y
-
-class polygon(shape):
-	def __init__(self, vertices):
-		self.vertices = vertices
-
-class circle(shape):
-	def __init__(self, middle, radius):
-		self.middle = middle
-		self.radius = radius
-
-class line(shape):
-	def __init__(self, a, b):
-		self.a = a
-		self.b = b
-
-class bezier(shape):
-	def __init__(self, vertices):
-		self.vertices = vertices
-
-
 def identify(bmp):
 	return []
 
