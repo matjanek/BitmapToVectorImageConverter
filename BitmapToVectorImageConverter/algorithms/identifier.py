@@ -163,7 +163,6 @@ for seg in slines.keys():
     for i in range(0, n):
         (cy,cx) = sline[i]
         (ny,nx) = sline[(i+1)%n]
-        print ("c: ({},{}) -> n: ({},{})".format(cx, cy, nx, ny))
         drawLine2(cmaskImg, c, cx, cy, nx, ny)
 
         markPixel(cmaskImg, c2, cx, cy)

@@ -123,8 +123,8 @@ def calculate_contour_lines(segments, cmask = None):
             s = segments[i,j]
             l = lengths[i,j]
 
-            print ("End ({},{}) - seg: {}, length of the chain: {}"
-                    .format(j,i, s, l))
+#            print ("End ({},{}) - seg: {}, length of the chain: {}"
+#                    .format(j,i, s, l))
 
 #            print ("({},{}) was not parent of any el, seg: {}, length: {}"
 #                    .format(j,i, s, l))
@@ -139,20 +139,20 @@ def calculate_contour_lines(segments, cmask = None):
 
     rchains = {}
 
-    print ("Chains joining")
+#    print ("Chains joining")
 
     for seg in lchains.keys():
         sslchains = sorted(lchains[seg],
                             key = lambda (i,j) : lengths[i,j])
         sslchains.reverse()
 
-        print ("Lengths: {}"
-                .format([lengths[i,j] for (i,j) in sslchains]))
+#        print ("Lengths: {}"
+#                .format([lengths[i,j] for (i,j) in sslchains]))
 
-        print ("Sorted ssl chains: {}".format(sslchains))
+ #       print ("Sorted ssl chains: {}".format(sslchains))
         filtered_chains = sslchains[0:longest_threshold]
 
-        print ("Filtered chains: {}".format(filtered_chains))
+#        print ("Filtered chains: {}".format(filtered_chains))
         nchains = len(filtered_chains)
         chain_lists = [calculate_chain(parents, cx, cy) for (cy,cx) in filtered_chains]
         chain_sets  = [set(c) for c in chain_lists]
@@ -162,29 +162,29 @@ def calculate_contour_lines(segments, cmask = None):
 
         for i in range(0, nchains):
             for j in range(0, i):
-                print ("Joining chain s1: {}, s2: {}"
-                    .format(filtered_chains[i], filtered_chains[j]))
+#                print ("Joining chain s1: {}, s2: {}"
+#                    .format(filtered_chains[i], filtered_chains[j]))
 
                 s1 = chain_sets[i]
                 s2 = chain_sets[j]
-                print ("ns1: {}, ns2: {}".format(len(s1), len(s2)))
+#                print ("ns1: {}, ns2: {}".format(len(s1), len(s2)))
 #                sand = s1.intersection(s2)
                 sor  = s1.union(s2)
                 nsor = len(sor)
                 sand = s1.intersection(s2)
                 nsand = len(sand)
-                print ("ns union: {}".format(nsor))
+#                print ("ns union: {}".format(nsor))
 
                 if nsor > mlength and nsand < 10:
                     mlength = nsor
                     mi = i
                     mj = j
-                    print ("New longest with length: {}, join s1: {} with s2: {}"
-                        .format(mlength, filtered_chains[i], filtered_chains[j]))
+#                    print ("New longest with length: {}, join s1: {} with s2: {}"
+#                        .format(mlength, filtered_chains[i], filtered_chains[j]))
 
         c1 = chain_lists[mi]
         c2 = chain_lists[mj]
-        print ("End: <{}, {}>".format(c1,c2))
+#        print ("End: <{}, {}>".format(c1,c2))
         c2.reverse()
 
         rchains[seg] = c1 + c2

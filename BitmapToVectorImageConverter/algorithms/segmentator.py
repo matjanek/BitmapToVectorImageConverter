@@ -38,6 +38,9 @@ mGray = color2gray(m)
 
 print("[{}] Calculating segments in otsu mask...".format(datetime.now()))
 (segments,colors) = calculate_connected_parts(mGray)
+# selmask = select_segment(segments, 200) # koło
+selmask = select_segment(segments, 609)
+
 
 print("[{}] Calculating segments' parameters ...".format(datetime.now()))
 
@@ -49,7 +52,7 @@ cmaskImg = m.Clone()
 clines = calculate_contour_lines(segments, cmask)
 # slines = detect_border_points(segments, cmask, clines)
 slines = contours_simplifications(clines, 4)
-classification = classificate_shapes(segments, None, slines)
+classification = classificate_shapes(segments, None, clines, slines)
 
 c = Array.CreateInstance(Byte, 3)
 c[0] = Byte(0)
@@ -62,20 +65,31 @@ c2[2] = Byte(0)
 
 
 for seg in slines.keys():
+    if seg != 200:
+        continue
+
     sline = slines[seg]
     n = len(sline)
-    print ("sline: {}, n: {}".format(sline, n))
+    markPixel(cmaskImg, c2, meansx[seg], meansy[seg])
+#    print ("sline: {}, n: {}".format(sline, n))
     for i in range(0, n):
         (cy,cx) = sline[i]
         (ny,nx) = sline[(i+1)%n]
-        print ("c: ({},{}) -> n: ({},{})".format(cx, cy, nx, ny))
+#        print ("c: ({},{}) -> n: ({},{})".format(cx, cy, nx, ny))
         drawLine2(cmaskImg, c, cx, cy, nx, ny)
 
-        markPixel(cmaskImg, c2, cx, cy)
+#        markPixel(cmaskImg, c2, cx, cy)
 #        markPixel(cmaskImg, c2, nx, ny)
 
-for seg in meansx.keys():
-	markPixel(cmaskImg, c2, meansx[seg], meansy[seg])
+#for seg in meansx.keys():
+#	markPixel(cmaskImg, c2, meansx[seg], meansy[seg])
+
+
+for seg in counts.keys():
+    print ("Segment {} size: {}".format(seg, counts[seg]))
+
+print("[{}] Saving selmask ...".format(datetime.now()))
+save_mask("mask.png", selmask, width, height, stride)
 
 
 print("[{}] Saving img with contours ...".format(datetime.now()))
