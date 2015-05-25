@@ -5,10 +5,12 @@ import sys
 
 import clr
 clr.AddReference("System.Drawing")
+clr.AddReferenceToFileAndPath("Svg.dll")
 
 from System import *
 from System.Drawing import *
 from System.Drawing.Imaging import *
+from Svg import *
 
 from utils import *
 from processing.segmentation.connected import *
@@ -39,8 +41,6 @@ mGray = color2gray(m)
 print("[{}] Calculating segments in otsu mask...".format(datetime.now()))
 (segments,colors) = calculate_connected_parts(mGray)
 # selmask = select_segment(segments, 200) # koło
-selmask = select_segment(segments, 2)
-
 
 print("[{}] Calculating segments' parameters ...".format(datetime.now()))
 
@@ -63,10 +63,25 @@ c2[0] = Byte(255)
 c2[1] = Byte(0)
 c2[2] = Byte(0)
 
+doc = SvgDocument()
+doc.Width = SvgUnit(width)
+doc.Height = SvgUnit(height)
+g = SvgGroup()
 
 for seg in slines.keys():
-    if seg != 200:
+    cx = colors[seg]
+    if seg == segments[0,0]:
         continue
+
+    if counts[seg] < 20:
+        continue
+    print ("Segment: {}, color: {}".format(seg, cx))
+    c3 = Color.FromArgb(cx, cx, cx)
+    poly = SvgPolygon()
+    poly.Stroke = SvgColourServer(Color.Red)
+    poly.Fill = SvgColourServer(c3)
+    poly.StrokeWidth = SvgUnit(1)
+    poly.Points = SvgPointCollection()
 
     sline = slines[seg]
     n = len(sline)
@@ -74,6 +89,9 @@ for seg in slines.keys():
 #    print ("sline: {}, n: {}".format(sline, n))
     for i in range(0, n):
         (cy,cx) = sline[i]
+        poly.Points.Add(SvgUnit(cx))
+        poly.Points.Add(SvgUnit(cy))
+
         (ny,nx) = sline[(i+1)%n]
 #        print ("c: ({},{}) -> n: ({},{})".format(cx, cy, nx, ny))
         drawLine2(cmaskImg, c, cx, cy, nx, ny)
@@ -83,14 +101,10 @@ for seg in slines.keys():
 
 #for seg in meansx.keys():
 #	markPixel(cmaskImg, c2, meansx[seg], meansy[seg])
+    g.Children.Add(poly)
 
-
-for seg in counts.keys():
-    print ("Segment {} size: {}".format(seg, counts[seg]))
-
-print("[{}] Saving selmask ...".format(datetime.now()))
-save_mask("mask.png", selmask, width, height, stride)
-
+doc.Children.Add(g)
+doc.Write("save.svg")
 
 print("[{}] Saving img with contours ...".format(datetime.now()))
 save_color("contours.png", cmaskImg, width, height, stride)
