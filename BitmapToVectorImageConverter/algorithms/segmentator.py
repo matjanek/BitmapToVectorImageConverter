@@ -54,6 +54,54 @@ clines = calculate_contour_lines(segments, cmask)
 slines = contours_simplifications(clines, 4)
 classification = classificate_shapes(segments, None, clines, slines)
 
+filtered_segments = [k for k in slines.keys() if counts[k] > 20]
+
+seg_inside = {}
+
+for seg1 in filtered_segments:
+    for seg2 in filtered_segments:
+        if seg1 == seg2:
+            seg_inside[(seg1,seg1)] = False
+            continue
+#        print ("Checking if {} in {}".format(seg1, seg2))
+        poly1 = slines[seg1]
+        poly2 = slines[seg2]
+        inside = polygon_inside(poly1,poly2,width)
+        seg_inside[(seg1,seg2)] = inside
+#        if inside:
+#            print ("Segment {} in {}".format(seg1,seg2))
+#            print ("p1: {}".format(poly1))
+#            print ("p2: {}".format(poly2))
+
+def calculate_z(segments,inside,m,seg):
+    if m.get(seg) != None:
+        return (m, m[seg])
+
+    zmax = -1
+
+    for nseg in segments:
+        if inside[(nseg,seg)]:
+            res = calculate_z(segments,inside,m,nseg)
+#            print ("res: {}".format(res))
+            (m,z) = res
+#            print ("m: {}, z: {}".format(m,z))
+            zmax = max(zmax, z)
+    m[seg] = zmax+1
+#    print ("m: {}, znew: {}".format(m, zmax+10))
+    return (m,zmax+1)
+
+def calculate_z_all(segments,inside,m):
+    print ("Segments: {}".format(segments))
+    for seg in segments:
+        (m,z) = calculate_z(segments,inside,m,seg)
+        print ("x'm: {}, z: {}".format(m,z))
+
+    return m
+
+msegz = calculate_z_all(filtered_segments, seg_inside, {})
+
+print("msegz: {}".format(msegz))
+
 c = Array.CreateInstance(Byte, 3)
 c[0] = Byte(0)
 c[1] = Byte(0)
@@ -68,10 +116,13 @@ doc.Width = SvgUnit(width)
 doc.Height = SvgUnit(height)
 g = SvgGroup()
 
-for seg in slines.keys():
+xlines = [k for k in filtered_segments]
+xlines2 = sorted(xlines, key=lambda k: msegz[k], reverse=True)
+
+for seg in xlines2:
     cx = colors[seg]
-    if seg == segments[0,0]:
-        continue
+#    if seg == segments[0,0]:
+#        continue
 
     if counts[seg] < 20:
         continue

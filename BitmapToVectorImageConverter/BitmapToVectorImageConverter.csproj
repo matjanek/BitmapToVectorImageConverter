@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ImageComparison\ImageComparer.cs" />
+    <Compile Include="ImageComparison\MSEComparisonUtility.cs" />
     <Compile Include="ImageComparison\PercentageComparisonUtility.cs" />
     <Compile Include="ImageComparison\SSIM.cs" />
     <Compile Include="MainForm.cs">
