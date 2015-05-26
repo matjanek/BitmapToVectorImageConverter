@@ -63,7 +63,7 @@ for seg1 in filtered_segments:
         if seg1 == seg2:
             seg_inside[(seg1,seg1)] = False
             continue
-
+        print ("Checking if {} in {}".format(seg1, seg2))
         poly1 = slines[seg1]
         poly2 = slines[seg2]
         inside = polygon_inside(poly1,poly2,width)
