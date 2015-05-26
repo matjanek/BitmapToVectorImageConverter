@@ -120,7 +120,7 @@
             // 
             // openInputImageDialog
             // 
-            this.openInputImageDialog.Filter = "BMP files (*.bmp)|*.bmp";
+            this.openInputImageDialog.Filter = "Image Files(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|All files (*.*)|*.*";
             this.openInputImageDialog.Title = "Open input raster image";
             // 
             // inputPictureBoxLabel
