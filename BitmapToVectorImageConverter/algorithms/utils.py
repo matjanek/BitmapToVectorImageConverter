@@ -366,7 +366,7 @@ def shoeShape(img): # bitmap
     img_color = image_mask(selmask, width, height, stride)
     return img_color
 
-def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 1e-6):
+def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 2.0):
 #    print("\n\n")
 #    print ("({},{}) - ({},{}) -> ({},{}) - ({},{})"
 #            .format(x1,y1,x2,y2,x3,y3,x4,y4))
@@ -389,19 +389,19 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 1e-6):
         x = float(b2*c1 - b1*c2)/float(det)
         y = float(a1*c2 - a2*c1)/float(det)
 #        print ("x:{}, y:{}".format(x,y))
-        if x < min(x1,x2) or x > max(x1,x2):
+        if x < min(x1,x2)-eps or x > max(x1,x2)+eps:
 #            print ("c1")
             return None
 
-        if x < min(x3,x4) or x > max(x3,x4):
+        if x < min(x3,x4)-eps or x > max(x3,x4)+eps:
 #            print ("c2")
             return None
 
-        if y < min(y1,y2) or y > max(y1,y2):
+        if y < min(y1,y2)-eps or y > max(y1,y2)+eps:
 #            print ("c3")
             return None
 
-        if y < min(y3,y4) or y > max(y3,y4):
+        if y < min(y3,y4)-eps or y > max(y3,y4)+eps:
 #            print ("c4")
             return None
 
@@ -442,9 +442,6 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
 
     c = 0
 
-
-#    print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
-
     for i in range(0, m):
         i2 = (i+1)%m
 
@@ -452,6 +449,7 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
         (y4,x4) = poly2[i2]
 
         r2 = line_intersection(x1,y1,x2,y2,x3,y3,x4,y4)
+#        print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
 #        print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
         if r2 != None:
 #            print ("Przecina się z {}-tą".format(i))

@@ -63,15 +63,15 @@ for seg1 in filtered_segments:
         if seg1 == seg2:
             seg_inside[(seg1,seg1)] = False
             continue
-
+#        print ("Checking if {} in {}".format(seg1, seg2))
         poly1 = slines[seg1]
         poly2 = slines[seg2]
         inside = polygon_inside(poly1,poly2,width)
         seg_inside[(seg1,seg2)] = inside
-        if inside:
-            print ("Segment {} in {}".format(seg1,seg2))
-            print ("p1: {}".format(poly1))
-            print ("p2: {}".format(poly2))
+#        if inside:
+#            print ("Segment {} in {}".format(seg1,seg2))
+#            print ("p1: {}".format(poly1))
+#            print ("p2: {}".format(poly2))
 
 def calculate_z(segments,inside,m,seg):
     if m.get(seg) != None:
@@ -82,12 +82,12 @@ def calculate_z(segments,inside,m,seg):
     for nseg in segments:
         if inside[(nseg,seg)]:
             res = calculate_z(segments,inside,m,nseg)
-            print ("res: {}".format(res))
+#            print ("res: {}".format(res))
             (m,z) = res
-            print ("m: {}, z: {}".format(m,z))
+#            print ("m: {}, z: {}".format(m,z))
             zmax = max(zmax, z)
     m[seg] = zmax+1
-    print ("m: {}, znew: {}".format(m, zmax+10))
+#    print ("m: {}, znew: {}".format(m, zmax+10))
     return (m,zmax+1)
 
 def calculate_z_all(segments,inside,m):
