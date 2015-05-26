@@ -68,10 +68,13 @@ doc.Width = SvgUnit(width)
 doc.Height = SvgUnit(height)
 g = SvgGroup()
 
-for seg in slines.keys():
+xlines = [k for (k,v) in slines.items()]
+xlines2 = sorted(xlines, key=lambda k: counts[k], reverse=True)
+
+for seg in xlines2:
     cx = colors[seg]
-    if seg == segments[0,0]:
-        continue
+#    if seg == segments[0,0]:
+#        continue
 
     if counts[seg] < 20:
         continue

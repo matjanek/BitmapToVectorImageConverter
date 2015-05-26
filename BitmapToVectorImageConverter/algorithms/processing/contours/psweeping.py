@@ -29,6 +29,13 @@ def detect_contours(segments, mask):
 						contour = True
 						break
 			rmask[i,j] = contour
+        for j in range(0, width):
+            rmask[0,j] = True
+            rmask[height-1,j] = True
+
+        for i in range(0, height):
+            rmask[i,0] = True
+            rmask[i,width-1] = True
 
 	return rmask
 
@@ -65,18 +72,20 @@ def calculate_contour_lines(segments, cmask = None):
             q.append([i,j])
             c = 1
             s = segments[i,j]
-#            print ("Segment: {}".format(s))
+            print ("Segment: {}".format(s))
             queued[i,j] = True
 
             while c > 0:
                 print("")
                 (qy,qx) = q.popleft()
-#                print ("queue ({},{}), seg: {}".format(qy,qx, segments[qy,qx]))
+                print ("queue ({},{}),cmask: {} seg: {}".format(qy,qx, cmask[qy,qx], segments[qy,qx]))
                 c -= 1
                 for k in range(-1,2):
                     for l in range(-1,2):
-                        y = (qy+k)%height
-                        x = (qx+l)%width
+                        y = (qy+k)
+                        x = (qx+l)
+                        if x < 0 or y < 0 or x >= width or y >= height:
+                            continue
 
 #                        if cmask != None:
 #                            print ("cmask for ({},{}) ({},{}) - {}, s: {}, queued: {}".format(y,x, k, l,cmask[y,x], segments[y,x], queued[y,x]))
