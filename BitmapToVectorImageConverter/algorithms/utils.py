@@ -367,8 +367,8 @@ def shoeShape(img): # bitmap
     return img_color
 
 def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 1e-6):
-    print ("({},{}) - ({},{}) -> ({},{}) - ({},{})"
-            .format(x1,y1,x2,y2,x3,y3,x4,y4))
+#    print ("({},{}) - ({},{}) -> ({},{}) - ({},{})"
+#            .format(x1,y1,x2,y2,x3,y3,x4,y4))
     a1 = y2-y1
     b1 = x2-x1
     c1 = a1*x1+b1*y1
@@ -378,13 +378,13 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 1e-6):
     c2 = a2*x3+b2*y3
 
     det = a1*b2 - a2*b1
-    print ("Det: {}".format(det))
+#    print ("Det: {}".format(det))
     if abs(det) < eps:
         return None # linie równoległe
     else:
         x = (b2*c1 - b1*c2)/det
         y = (a1*c2 - a2*c1)/det
-        print ("x:{}, y:{}".format(x,y))
+#        print ("x:{}, y:{}".format(x,y))
         if x < min(x1,x2) or x > max(x1,x2):
             return None
 
@@ -415,7 +415,7 @@ def polygon_inside(poly1, poly2): # czy p1 jest w p2
             (y4,x4) = poly2[j2]
 
             if line_intersection(x1,y1,x2,y2,x3,y3,x4,y4) != None:
-                print ("Linia {}-ta przecina się z {}-tą".format(i,j))
+#                print ("Linia {}-ta przecina się z {}-tą".format(i,j))
                 return False
 
     (qy,qx) = poly1[0]
@@ -439,10 +439,10 @@ def polygon_inside(poly1, poly2): # czy p1 jest w p2
         (y4,x4) = poly2[i2]
 
         if line_intersection(x1,y1,x2,y2,x3,y3,x4,y4):
-            print ("Przecina się z {}-tą".format(i))
+#            print ("Przecina się z {}-tą".format(i))
             c += 1
 
-    print ("c: {}".format(c))
+#    print ("c: {}".format(c))
     return (c % 2 == 1)
 
 
