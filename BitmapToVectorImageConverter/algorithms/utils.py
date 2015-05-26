@@ -407,7 +407,7 @@ def polygon_inside(poly1, poly2): # czy p1 jest w p2
     for i in range(0, n):
         i2 = (i+1)%n
         for j in range(i, m):
-            j2 = (j+1)%n
+            j2 = (j+1)%m
 
             (y1,x1) = poly1[i]
             (y2,x2) = poly1[i2]

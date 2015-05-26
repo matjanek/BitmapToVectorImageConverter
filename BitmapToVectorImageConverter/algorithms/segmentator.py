@@ -54,6 +54,48 @@ clines = calculate_contour_lines(segments, cmask)
 slines = contours_simplifications(clines, 4)
 classification = classificate_shapes(segments, None, clines, slines)
 
+seg_inside = {}
+
+for seg1 in slines.keys():
+    for seg2 in slines.keys():
+        if seg1 == seg2:
+            seg_inside[(seg1,seg1)] = False
+            continue
+
+        poly1 = slines[seg1]
+        poly2 = slines[seg2]
+        inside = polygon_inside(poly1,poly2)
+        seg_inside[(seg1,seg2)] = inside
+
+def calculate_z(segments,inside,m,seg):
+    if m.get(seg) != None:
+        return (m, m[seg])
+
+    zmax = -1
+
+    for nseg in segments:
+        if inside[(nseg,seg)]:
+            res = calculate_z(segments,inside,m,nseg)
+            print ("res: {}".format(res))
+            (m,z) = res
+            print ("m: {}, z: {}".format(m,z))
+            zmax = max(zmax, z)
+    m[seg] = zmax+1
+    print ("m: {}, znew: {}".format(m, zmax+10))
+    return (m,zmax+1)
+
+def calculate_z_all(segments,inside,m):
+    print ("Segments: {}".format(segments))
+    for seg in segments:
+        (m,z) = calculate_z(segments,inside,m,seg)
+        print ("x'm: {}, z: {}".format(m,z))
+
+    return m
+
+msegz = calculate_z_all(slines.keys(), seg_inside, {})
+
+print("msegz: {}".format(msegz))
+
 c = Array.CreateInstance(Byte, 3)
 c[0] = Byte(0)
 c[1] = Byte(0)
