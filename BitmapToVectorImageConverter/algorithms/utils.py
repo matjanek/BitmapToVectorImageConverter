@@ -367,40 +367,48 @@ def shoeShape(img): # bitmap
     return img_color
 
 def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 1e-6):
+#    print("\n\n")
 #    print ("({},{}) - ({},{}) -> ({},{}) - ({},{})"
 #            .format(x1,y1,x2,y2,x3,y3,x4,y4))
     a1 = y2-y1
     b1 = x2-x1
     c1 = a1*x1+b1*y1
+#    print("a1: {}, b1: {}, c1: {}".format(a1,b1, c1))
 
     a2 = y4-y3
     b2 = x4-x3
     c2 = a2*x3+b2*y3
+
+#    print("a2: {}, b2: {}, c2: {}".format(a2,b2,c2))
 
     det = a1*b2 - a2*b1
 #    print ("Det: {}".format(det))
     if abs(det) < eps:
         return None # linie równoległe
     else:
-        x = (b2*c1 - b1*c2)/det
-        y = (a1*c2 - a2*c1)/det
+        x = float(b2*c1 - b1*c2)/float(det)
+        y = float(a1*c2 - a2*c1)/float(det)
 #        print ("x:{}, y:{}".format(x,y))
         if x < min(x1,x2) or x > max(x1,x2):
+#            print ("c1")
             return None
 
         if x < min(x3,x4) or x > max(x3,x4):
+#            print ("c2")
             return None
 
         if y < min(y1,y2) or y > max(y1,y2):
+#            print ("c3")
             return None
 
         if y < min(y3,y4) or y > max(y3,y4):
+#            print ("c4")
             return None
 
 
         return (x,y)
 
-def polygon_inside(poly1, poly2): # czy p1 jest w p2
+def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
     n = len(poly1)
     m = len(poly2)
 
@@ -425,12 +433,17 @@ def polygon_inside(poly1, poly2): # czy p1 jest w p2
         xmin = min(xmin, px)
         xmax = max(xmax, px)
 
+#    print ("xmax: {}".format(xmax))
+
     # wyznaczmy poziomą linię?
 
-    (y2,x2) = (qy,xmax)
+    (y2,x2) = (qy,width-1)
     (y1,x1) = (qy,qx)
 
     c = 0
+
+
+#    print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
 
     for i in range(0, m):
         i2 = (i+1)%m
@@ -438,8 +451,11 @@ def polygon_inside(poly1, poly2): # czy p1 jest w p2
         (y3,x3) = poly2[i]
         (y4,x4) = poly2[i2]
 
-        if line_intersection(x1,y1,x2,y2,x3,y3,x4,y4):
+        r2 = line_intersection(x1,y1,x2,y2,x3,y3,x4,y4)
+#        print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
+        if r2 != None:
 #            print ("Przecina się z {}-tą".format(i))
+#            print ("R2: {}".format(r2))
             c += 1
 
 #    print ("c: {}".format(c))

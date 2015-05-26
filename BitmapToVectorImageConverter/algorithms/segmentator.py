@@ -64,8 +64,14 @@ for seg1 in slines.keys():
 
         poly1 = slines[seg1]
         poly2 = slines[seg2]
-        inside = polygon_inside(poly1,poly2)
+        inside = polygon_inside(poly1,poly2,width)
         seg_inside[(seg1,seg2)] = inside
+        if inside:
+            print ("Segment {} in {}".format(seg1,seg2))
+            print ("p1: {}".format(poly1))
+            print ("p2: {}".format(poly2))
+
+print ("Inside 3 in 2 - {}".format(polygon_inside(slines[3],slines[2],width)))
 
 def calculate_z(segments,inside,m,seg):
     if m.get(seg) != None:
@@ -111,7 +117,7 @@ doc.Height = SvgUnit(height)
 g = SvgGroup()
 
 xlines = [k for (k,v) in slines.items()]
-xlines2 = sorted(xlines, key=lambda k: counts[k], reverse=True)
+xlines2 = sorted(xlines, key=lambda k: msegz[k], reverse=True)
 
 for seg in xlines2:
     cx = colors[seg]
