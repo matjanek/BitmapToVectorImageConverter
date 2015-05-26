@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Lomont;
 
 namespace BitmapToVectorImageConverter.ImageComparison
@@ -13,59 +14,60 @@ namespace BitmapToVectorImageConverter.ImageComparison
         Percentage,
         SSIM
     }
-    public enum ImageComparisonPair
-    {
-        InputVector,
-        InputOutput,
-        VectorOutput
-    }
+    
     public class ImageComparer
     {
-        private Bitmap _input;
-        private Bitmap _vector;
-        private Bitmap _output;
+        private Bitmap _model;
+        private List<Bitmap> _images;
+        private List<string> _fileNames;
 
-        public ImageComparer(Bitmap input, Bitmap vector, Bitmap output)
+        public ImageComparer(Bitmap model, List<Bitmap> images, ListBox.ObjectCollection fileNames)
         {
-            _input = input;
-            _vector = vector;
-            _output = output;
+            _model = model;
+            _images = images;
+            _fileNames = new List<string>();
+            foreach (var fileName in fileNames)
+            {
+                _fileNames.Add(fileName.ToString());
+            }
         }
 
-        public double Compare(ImageComparisonPair ICP, ImageComparisonMethods ICM)
+        public string Compare(IProgress<int> progress)
         {
-            Bitmap image1;
-            Bitmap image2;
-            switch (ICP)
+            const int methodsCount = 3;
+            int images = _images.Count;
+            int iterations = methodsCount*images;
+            string results = "File;Percentage;SSIM;MSE\r\n";
+            ReportProgress(progress, 0d);
+            for (int i = 0; i < images; i++)
             {
-                case ImageComparisonPair.InputVector:
-                    image1 = _input;
-                    image2 = _vector;
-                    break;
-                case ImageComparisonPair.InputOutput:
-                    image1 = _input;
-                    image2 = _output;
-                    break;
-                case ImageComparisonPair.VectorOutput:
-                    image1 = _vector;
-                    image2 = _output;
-                    break;
-                default:
-                    return double.NaN;
-            }
-            if (image1 == null || image2 == null)
-            {
-                return double.NaN;
-            }
-            switch (ICM)
-            {
-                case ImageComparisonMethods.Percentage:
-                    return PercentageComparisonUtility.Compare(image1, image2);
-                case ImageComparisonMethods.SSIM:
+                Bitmap image = _images[i];
+                if (_model.Width == image.Width && _model.Height == image.Height)
+                {
+                    double percentageResult = PercentageComparisonUtility.Compare(_model, image);
+                    ReportProgress(progress, 100 * (3 * i + 1) / iterations);
                     SSIM ssim = new SSIM();
-                    return ssim.Index(image1, image2);
-                default:
-                    return double.NaN;
+                    double ssimResult = ssim.Index(_model, image);
+                    ReportProgress(progress, 100 * (3 * i + 2) / iterations);
+                    // TODO MSE compare
+                    double mseResult = double.NaN;
+                    ReportProgress(progress, 100 * (3 * i + 3) / iterations);
+                    results += _fileNames[i] + ";" + percentageResult + ";" + ssimResult + ";" + mseResult + "\r\n";
+                }
+                else
+                {
+                    ReportProgress(progress, 100 * (3 * i + 3) / iterations);
+                    results += _fileNames[i] + ";" + double.NaN + ";" + double.NaN + ";" + double.NaN + "\r\n";
+                }
+            }
+            return results;
+        }
+
+        void ReportProgress(IProgress<int> progress, double progressValue)
+        {
+            if (progress != null)
+            {
+                progress.Report((int)Math.Round(progressValue));
             }
         }
     }

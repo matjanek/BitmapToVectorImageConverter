@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,77 +14,93 @@ namespace BitmapToVectorImageConverter
 {
     public partial class MainForm : Form
     {
-        private Bitmap _inputImage;
-        private Bitmap _vectorImageForComparison;
-        private Bitmap _outputImage;
+        private Bitmap _modelImage;
+        private List<Bitmap> _imagesLoaded;
         public MainForm()
         {
             InitializeComponent();
         }
 
-        private void openInputFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openModelImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (openInputImageDialog.ShowDialog() == DialogResult.OK)
+            if (openModelImageDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    _inputImage = new Bitmap(openInputImageDialog.FileName);
+                    _modelImage = new Bitmap(openModelImageDialog.FileName);
                 }
                 catch (Exception ex)
                 {
                     ShowError(ex);
                 }
             }
-            if (_inputImage != null)
+            if (_modelImage != null)
             {
-                inputPictureBox.Image = _inputImage;
-                inputPictureBox.Visible = true;
-                inputPictureBoxLabel.Text = "Input image";
-                inputPictureBoxLabel.ForeColor = Color.Black;
-                convertButton.Enabled = true;
+                modelImagePictureBox.Image = _modelImage;
+                modelImagePictureBox.Visible = true;
+                modelImagePictureBoxLabel.Text = "Model image";
+                modelImagePictureBoxLabel.ForeColor = Color.Black;
             }
             else
             {
-                inputPictureBox.Visible = false;
-                inputPictureBoxLabel.Text = "No input image loaded!";
-                inputPictureBoxLabel.ForeColor = Color.Red;
-                convertButton.Enabled = false;
+                modelImagePictureBox.Visible = false;
+                modelImagePictureBoxLabel.Text = "No model image loaded!";
+                modelImagePictureBoxLabel.ForeColor = Color.Red;
             }
         }
 
-        private void openVectorImageForComparisonToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openImagesForComparisonToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (openVectorImageForComparisonFileDialog.ShowDialog() == DialogResult.OK)
+            if (openImagesDialog.ShowDialog() == DialogResult.OK)
             {
-                try
+                _imagesLoaded = new List<Bitmap>();
+                imagesLoadedListBox.Items.Clear();
+                foreach (var file in openImagesDialog.FileNames)
                 {
-                    _vectorImageForComparison = new Bitmap(openVectorImageForComparisonFileDialog.FileName);
+                    try
+                    {
+                        _imagesLoaded.Add(new Bitmap(file));
+                        imagesLoadedListBox.Items.Add(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowError(ex);
+                    }
                 }
-                catch (Exception ex)
+                if (imagesLoadedListBox.Items.Count > 0 && _imagesLoaded.Count > 0)
                 {
-                    ShowError(ex);
+                    imagesLoadedListBox.SelectedIndex = 0;
+                    imageLoadedPictureBox.Image = _imagesLoaded[0];
+                    imageLoadedPictureBox.Visible = true;
                 }
-            }
-            if (_vectorImageForComparison != null)
-            {
-                vectorImageForComparisonPictureBox.Image = _vectorImageForComparison;
-                vectorImageForComparisonPictureBox.Visible = true;
-                vectorImageForComparisonPictureBoxLabel.Text = "Vector image for comparison";
-                vectorImageForComparisonPictureBoxLabel.ForeColor = Color.Black;
-            }
-            else
-            {
-                vectorImageForComparisonPictureBox.Visible = false;
-                vectorImageForComparisonPictureBoxLabel.Text = "No vector image for comparison loaded!";
-                vectorImageForComparisonPictureBoxLabel.ForeColor = Color.Red;
+                else
+                {
+                    imageLoadedPictureBox.Image = null;
+                    imageLoadedPictureBox.Visible = false;
+                }
             }
         }
 
         private void ShowError(Exception ex)
         {
             const string title = "Error";
-            String error = "An error occured while loading file. Please try again.\nError: " + ex.Message;
+            var error = "An error occured while loading file.\nError: " + ex.Message;
             MessageBox.Show(error, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void imagesLoadedListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var index = imagesLoadedListBox.SelectedIndex;
+            if (index >= 0 && index < _imagesLoaded.Count)
+            {
+                imageLoadedPictureBox.Image = _imagesLoaded[index];
+                imageLoadedPictureBox.Visible = true;
+            }
+            else
+            {
+                imageLoadedPictureBox.Image = null;
+                imageLoadedPictureBox.Visible = false;
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -91,49 +108,36 @@ namespace BitmapToVectorImageConverter
             Close();
         }
 
-        private void convertButton_Click(object sender, EventArgs e)
+        private async void compareButton_Click(object sender, EventArgs e)
         {
-            if (_inputImage != null)
+            compareButton.Enabled = false;
+            progressLabel.Visible = true;
+            saveResultsFileDialog.ShowDialog();
+            _modelImage = new Bitmap(openModelImageDialog.FileName);
+            ImageComparer IC = new ImageComparer(_modelImage, _imagesLoaded, imagesLoadedListBox.Items);
+            var progress = new Progress<int>(percent =>
             {
-                //TODO start konwersji obrazka z _inputImage z zadanymi parametrami
-                var converter = new RasterToVectorConverter(_inputImage);
-				var result = GisConverter.Convert (_inputImage);
-                /* 
-                 * otrzymujemy _outputImage
-                 * aktualnie przepisuje _inputImage do _outputImage bez zmian
-                 */
-                _outputImage = new Bitmap(_inputImage);
-                if (_outputImage != null)
+                progressLabel.Text = "Progress: " + percent + "%";
+            });
+            string comparisonResults = await Task.Run(() => IC.Compare(progress));
+            comparisonStatisticsTextBox.Text = comparisonResults;
+            if (saveResultsFileDialog.FileName != "")
+            {
+                try
                 {
-                    outputPictureBox.Image = _inputImage;
-                    outputPictureBox.Visible = true;
-                    outputPictureBoxLabel.Text = "Output image";
-                    outputPictureBoxLabel.ForeColor = Color.Black;
+                    StreamWriter file = new StreamWriter(saveResultsFileDialog.FileName);
+                    file.WriteLine(comparisonResults);
+                    file.Close();
                 }
-                else
+                catch (Exception ex)
                 {
-                    outputPictureBox.Visible = false;
-                    outputPictureBoxLabel.Text = "No output image generated!";
-                    outputPictureBoxLabel.ForeColor = Color.Red;
+                    const string title = "Error";
+                    var error = "An error occured while creating file.\nError: " + ex.Message;
+                    MessageBox.Show(error, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-        }
-
-        private void compareButton_Click(object sender, EventArgs e)
-        {
-            ImageComparer IC = new ImageComparer(_inputImage, _vectorImageForComparison, _outputImage);
-            double percentageIV = IC.Compare(ImageComparisonPair.InputVector, ImageComparisonMethods.Percentage);
-            double percentageIO = IC.Compare(ImageComparisonPair.InputOutput, ImageComparisonMethods.Percentage);
-            double percentageVO = IC.Compare(ImageComparisonPair.VectorOutput, ImageComparisonMethods.Percentage);
-            percentageComparisonInputVectorLabel.Text = "Percentage comparison (input - vector): " + percentageIV;
-            percentageComparisonInputOutputLabel.Text = "Percentage comparison (input - output): " + percentageIO;
-            percentageComparisonVectorOutputLabel.Text = "Percentage comparison (vector - output): " + percentageVO;
-            double ssimIV = IC.Compare(ImageComparisonPair.InputVector, ImageComparisonMethods.SSIM);
-            double ssimIO = IC.Compare(ImageComparisonPair.InputOutput, ImageComparisonMethods.SSIM);
-            double ssimVO = IC.Compare(ImageComparisonPair.VectorOutput, ImageComparisonMethods.SSIM);
-            ssimComparisonInputVectorLabel.Text = "SSIM comparison (input - vector): " + ssimIV;
-            ssimComparisonInputOutputLabel.Text = "SSIM comparison (input - output): " + ssimIO;
-            ssimComparisonVectorOutputLabel.Text = "SSIM comparison (vector - output): " + ssimVO;
+            compareButton.Enabled = true;
+            progressLabel.Visible = false;
         }
     }
 }
