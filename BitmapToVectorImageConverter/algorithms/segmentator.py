@@ -54,10 +54,12 @@ clines = calculate_contour_lines(segments, cmask)
 slines = contours_simplifications(clines, 4)
 classification = classificate_shapes(segments, None, clines, slines)
 
+filtered_segments = [k for k in slines.keys() if counts[k] > 20]
+
 seg_inside = {}
 
-for seg1 in slines.keys():
-    for seg2 in slines.keys():
+for seg1 in filtered_segments:
+    for seg2 in filtered_segments:
         if seg1 == seg2:
             seg_inside[(seg1,seg1)] = False
             continue
@@ -70,8 +72,6 @@ for seg1 in slines.keys():
             print ("Segment {} in {}".format(seg1,seg2))
             print ("p1: {}".format(poly1))
             print ("p2: {}".format(poly2))
-
-print ("Inside 3 in 2 - {}".format(polygon_inside(slines[3],slines[2],width)))
 
 def calculate_z(segments,inside,m,seg):
     if m.get(seg) != None:
@@ -98,7 +98,7 @@ def calculate_z_all(segments,inside,m):
 
     return m
 
-msegz = calculate_z_all(slines.keys(), seg_inside, {})
+msegz = calculate_z_all(filtered_segments, seg_inside, {})
 
 print("msegz: {}".format(msegz))
 
@@ -116,7 +116,7 @@ doc.Width = SvgUnit(width)
 doc.Height = SvgUnit(height)
 g = SvgGroup()
 
-xlines = [k for (k,v) in slines.items()]
+xlines = [k for k in filtered_segments]
 xlines2 = sorted(xlines, key=lambda k: msegz[k], reverse=True)
 
 for seg in xlines2:
