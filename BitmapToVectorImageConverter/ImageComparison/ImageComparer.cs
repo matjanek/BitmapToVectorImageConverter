@@ -37,7 +37,7 @@ namespace BitmapToVectorImageConverter.ImageComparison
             const int methodsCount = 3;
             int images = _images.Count;
             int iterations = methodsCount*images;
-            string results = "File;Percentage;SSIM;MSE\r\n";
+            string results = "File;Percentage;MSE;SSIM\r\n";
             ReportProgress(progress, 0d);
             for (int i = 0; i < images; i++)
             {
@@ -46,13 +46,11 @@ namespace BitmapToVectorImageConverter.ImageComparison
                 {
                     double percentageResult = PercentageComparisonUtility.Compare(_model, image);
                     ReportProgress(progress, 100 * (3 * i + 1) / iterations);
-                    SSIM ssim = new SSIM();
-                    double ssimResult = ssim.Index(_model, image);
+                    double mseResult = MSEComparisonUtility.Compare(_model, image);
                     ReportProgress(progress, 100 * (3 * i + 2) / iterations);
-                    // TODO MSE compare
-                    double mseResult = double.NaN;
+                    double ssimResult = new SSIM().Index(_model, image);
                     ReportProgress(progress, 100 * (3 * i + 3) / iterations);
-                    results += _fileNames[i] + ";" + percentageResult + ";" + ssimResult + ";" + mseResult + "\r\n";
+                    results += _fileNames[i] + ";" + percentageResult + ";" + mseResult + ";" + ssimResult + "\r\n";
                 }
                 else
                 {

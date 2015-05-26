@@ -36,6 +36,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openImagesDialog = new System.Windows.Forms.OpenFileDialog();
             this.comparisonGroupBox = new System.Windows.Forms.GroupBox();
+            this.progressLabel = new System.Windows.Forms.Label();
             this.comparisonStatisticsTextBox = new System.Windows.Forms.TextBox();
             this.compareButton = new System.Windows.Forms.Button();
             this.modelImagePictureBoxLabel = new System.Windows.Forms.Label();
@@ -45,7 +46,6 @@
             this.imageLoadedPictureBox = new System.Windows.Forms.PictureBox();
             this.imagesLoadedListBox = new System.Windows.Forms.ListBox();
             this.saveResultsFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.progressLabel = new System.Windows.Forms.Label();
             this.menuStrip.SuspendLayout();
             this.comparisonGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modelImagePictureBox)).BeginInit();
@@ -120,6 +120,16 @@
             this.comparisonGroupBox.TabStop = false;
             this.comparisonGroupBox.Text = "Image comparison statistics";
             // 
+            // progressLabel
+            // 
+            this.progressLabel.AutoSize = true;
+            this.progressLabel.Location = new System.Drawing.Point(524, 163);
+            this.progressLabel.Name = "progressLabel";
+            this.progressLabel.Size = new System.Drawing.Size(54, 13);
+            this.progressLabel.TabIndex = 5;
+            this.progressLabel.Text = "Progress: ";
+            this.progressLabel.Visible = false;
+            // 
             // comparisonStatisticsTextBox
             // 
             this.comparisonStatisticsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -133,8 +143,6 @@
             // 
             // compareButton
             // 
-            this.compareButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.compareButton.Location = new System.Drawing.Point(443, 158);
             this.compareButton.Name = "compareButton";
             this.compareButton.Size = new System.Drawing.Size(75, 23);
@@ -211,16 +219,6 @@
             this.saveResultsFileDialog.FileName = "results.csv";
             this.saveResultsFileDialog.Filter = "CSV(*.csv)|*.csv";
             this.saveResultsFileDialog.Title = "Save results to file";
-            // 
-            // progressLabel
-            // 
-            this.progressLabel.AutoSize = true;
-            this.progressLabel.Location = new System.Drawing.Point(524, 163);
-            this.progressLabel.Name = "progressLabel";
-            this.progressLabel.Size = new System.Drawing.Size(54, 13);
-            this.progressLabel.TabIndex = 5;
-            this.progressLabel.Text = "Progress: ";
-            this.progressLabel.Visible = false;
             // 
             // MainForm
             // 

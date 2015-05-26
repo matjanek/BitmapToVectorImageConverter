@@ -110,21 +110,21 @@ namespace BitmapToVectorImageConverter
 
         private async void compareButton_Click(object sender, EventArgs e)
         {
+            saveResultsFileDialog.ShowDialog();
             compareButton.Enabled = false;
             progressLabel.Visible = true;
-            saveResultsFileDialog.ShowDialog();
-            _modelImage = new Bitmap(openModelImageDialog.FileName);
-            ImageComparer IC = new ImageComparer(_modelImage, _imagesLoaded, imagesLoadedListBox.Items);
-            var progress = new Progress<int>(percent =>
-            {
-                progressLabel.Text = "Progress: " + percent + "%";
-            });
-            string comparisonResults = await Task.Run(() => IC.Compare(progress));
-            comparisonStatisticsTextBox.Text = comparisonResults;
             if (saveResultsFileDialog.FileName != "")
             {
                 try
                 {
+                    _modelImage = new Bitmap(openModelImageDialog.FileName);
+                    ImageComparer IC = new ImageComparer(_modelImage, _imagesLoaded, imagesLoadedListBox.Items);
+                    var progress = new Progress<int>(percent =>
+                    {
+                        progressLabel.Text = "Progress: " + percent + "%";
+                    });
+                    string comparisonResults = await Task.Run(() => IC.Compare(progress));
+                    comparisonStatisticsTextBox.Text = comparisonResults;
                     StreamWriter file = new StreamWriter(saveResultsFileDialog.FileName);
                     file.WriteLine(comparisonResults);
                     file.Close();
@@ -132,7 +132,7 @@ namespace BitmapToVectorImageConverter
                 catch (Exception ex)
                 {
                     const string title = "Error";
-                    var error = "An error occured while creating file.\nError: " + ex.Message;
+                    var error = "An error occured while comparing images.\nError: " + ex.Message;
                     MessageBox.Show(error, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
