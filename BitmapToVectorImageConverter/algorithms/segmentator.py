@@ -35,7 +35,8 @@ print("[{}] Converting to matrix...".format(datetime.now()))
 m = array2matrix(data, width, height, stride)
 
 print("[{}] Converting to gray...".format(datetime.now()))
-mGray = color2gray(m)
+mGray2 = color2gray(m)
+mGray = median_filter(mGray2)
 
 
 print("[{}] Calculating segments in otsu mask...".format(datetime.now()))
@@ -51,7 +52,7 @@ cmask = detect_contours(segments, None)
 cmaskImg = m.Clone()
 clines = calculate_contour_lines(segments, cmask)
 # slines = detect_border_points(segments, cmask, clines)
-slines = contours_simplifications(clines, 4)
+slines = contours_simplifications(clines, 0.5)
 classification = classificate_shapes(segments, None, clines, slines)
 
 filtered_segments = [k for k in slines.keys() if counts[k] > 20]
@@ -163,7 +164,35 @@ save_color("contours.png", cmaskImg, width, height, stride)
 print("[{}] Saving img with contours ...".format(datetime.now()))
 save_color("m.png", m, width, height, stride)
 
-
-
 print("[{}] Saving cmask ...".format(datetime.now()))
 save_mask("cmask.png", cmask, width, height, stride)
+
+col = Array.CreateInstance(Byte, 3)
+col[0] = 255
+col[1] = 0
+col[2] = 0
+
+col2 = Array.CreateInstance(Byte, 3)
+col2[0] = 0
+col2[1] = 0
+col2[2] = 255
+
+col3 = Array.CreateInstance(Byte, 3)
+col3[0] = 0
+col3[1] = 255
+col3[2] = 0
+
+for seg in slines.keys():
+    if counts[seg] < 20:
+        continue
+    
+    m = select_segment(segments, seg)
+    g = bool2gray(m)
+    c = gray2color(g)
+    print ("Saving segment: {}".format(seg))
+    c2 = mark_contours(c, col, cmask, segments, seg)
+    c3 = mark_cline(c, col2, clines[seg])
+    c4 = mark_sline(c, col3, slines[seg])
+    save_color("seg-{}.png".format(seg),c2, width, height, stride)
+    save_color("seg-cline-{}.png".format(seg),c3, width, height, stride)
+    save_color("seg-sline-{}.png".format(seg),c4, width, height, stride)

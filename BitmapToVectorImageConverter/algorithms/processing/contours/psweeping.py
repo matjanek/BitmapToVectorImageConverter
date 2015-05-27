@@ -57,6 +57,7 @@ def calculate_contour_lines(segments, cmask = None):
     parents = Array.CreateInstance(int,height, width, 2)
     lengths = Array.CreateInstance(int, height, width)
     queued  = Array.CreateInstance(bool, height, width)
+    segment_was = {}
 
     for i in range(0, height):
         for j in range(0, width):
@@ -67,18 +68,22 @@ def calculate_contour_lines(segments, cmask = None):
         for j in range(0, width):
             if cmask != None and not(cmask[i,j]) and not(queued[i,j]):
                 continue
-
+            s = segments[i,j]
+            if segment_was.get(s) != None:
+                continue
+                
             q = deque()
             q.append([i,j])
             c = 1
-            s = segments[i,j]
-            print ("Segment: {}".format(s))
+            
+            # print ("Segment: {}".format(s))
             queued[i,j] = True
+            segment_was[s] = True
 
             while c > 0:
                 print("")
                 (qy,qx) = q.popleft()
-                print ("queue ({},{}),cmask: {} seg: {}".format(qy,qx, cmask[qy,qx], segments[qy,qx]))
+                # print ("queue ({},{}),cmask: {} seg: {}".format(qy,qx, cmask[qy,qx], segments[qy,qx]))
                 c -= 1
                 for k in range(-1,2):
                     for l in range(-1,2):

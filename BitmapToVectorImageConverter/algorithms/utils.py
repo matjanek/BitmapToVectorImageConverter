@@ -459,4 +459,63 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
 #    print ("c: {}".format(c))
     return (c % 2 == 1)
 
-
+def mark_contours(img, c, cmask, segments, seg):
+    height = img.GetLength(0)
+    width  = img.GetLength(1)
+    
+    contours = img.Clone()
+    
+    for i in range(0, height):
+        for j in range(0, width):
+            if not(cmask[i,j]):
+                continue
+                
+            if segments[i,j] != seg:
+                continue
+                
+            for k in range(0, 3):
+                contours[i,j,k] = c[k]
+    return contours
+    
+def mark_cline(img, c, contour):
+    img2 = img.Clone()
+    for (y,x) in contour:
+        for k in range(0,3):
+            img2[y,x,k] = c[k]
+            
+    return img2
+    
+def mark_sline(img, c, contour):
+    img2 = img.Clone()
+    n = len(contour)
+    for i in range(0, n):
+        i2 = (i+1)%n
+        (y1,x1) = contour[i]
+        (y2,x2) = contour[i2]
+        drawLine2(img2, c, x1, y1, x2, y2)
+            
+    return img2
+    
+def median_filter(img, radius = 2):
+    height = img.GetLength(0)
+    width  = img.GetLength(1)
+    
+    dim = 2*radius+1
+    n = dim*dim
+    t = Array.CreateInstance(Byte,n)
+    stride = dim
+    img2 = img.Clone()
+    
+    for i in range(0, height):
+        for j in range(0, width):
+            for k in range(-radius,radius+1):
+                for l in range(-radius,radius+1):
+                    y = (i+k)%height
+                    x = (j+l)%width
+                    
+                    idx = stride*(k+1)+(l+1)
+                    t[idx] = img[y,x]
+                    
+            Array.Sort(t)
+            img2[i,j] = t[(n-1)/2]
+    return img2
