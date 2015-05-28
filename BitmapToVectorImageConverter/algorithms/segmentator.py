@@ -52,7 +52,7 @@ cmask = detect_contours(segments, None)
 cmaskImg = m.Clone()
 clines = calculate_contour_lines(segments, cmask)
 # slines = detect_border_points(segments, cmask, clines)
-slines = contours_simplifications(clines, 0.5)
+slines = contours_simplifications(clines, 0.1)
 classification = classificate_shapes(segments, None, clines, slines)
 
 filtered_segments = [k for k in slines.keys() if counts[k] > 20]
