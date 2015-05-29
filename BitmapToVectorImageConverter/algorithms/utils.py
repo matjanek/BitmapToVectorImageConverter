@@ -408,6 +408,17 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 0.5):
 
         return (x,y)
 
+def sign(x):
+    if x > 0:
+        return 1
+    elif x < 0:
+        return -1
+    else:
+        return 0
+
+def line_position(x1,y1,x2,y2,x,y):
+    return sign((x2-x1)*(y-y1) - (y2-y1)*(x-x1))
+
 def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
     n = len(poly1)
     m = len(poly2)
@@ -445,9 +456,11 @@ def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
     print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
     for i in range(0, m):
         i2 = (i+1)%m
+        i3 = (i+2)%m
 
         (y3,x3) = poly2[i]
         (y4,x4) = poly2[i2]
+        (y5,x5) = poly2[i3]
 
         r2 = line_intersection(x1,y1,x2,y2,x3,y3,x4,y4)
         print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
@@ -458,7 +471,16 @@ def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
             if abs(rx-x3) <= eps and (ry - y3) <= eps:
                 print ("W poprzednim okrążeniu dodaliśmy, dodajemy tylko prawe końce - przeciecia")
                 continue
+
+            s1 = line_position(x1,y1,x2,y2,x3,y3)
+            s2 = line_position(x1,y1,x2,y2,x5,y5)
+            s = s1*s2
+            if s > -1:
+                print ("Styka się, ale nie przecina")
+                continue
+
             c += 1
+
     print ("c: {}".format(c))
     return (c % 2 == 1)
 
