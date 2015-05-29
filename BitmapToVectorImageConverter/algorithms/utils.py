@@ -389,15 +389,7 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 0.5):
     else:
         x = float((x1*y2 - y1*x2)*(x3-x4) - (x1-x2)*(x3*y4 - y3*x4))/float(det)
         y = float((x1*y2 - y1*x2)*(y3-y4) - (y1-y2)*(x3*y4 - y3*x4))/float(det)
-        dx1 = x2-x1
-        dx2 = x4-x3
-        dy1 = y2-y1
-        dy2 = y4-y3
-
-        tx1 = (x-x1)/dx1 if abs(dx1) >= eps else (y-y1)/dy1
-        tx2 = (x-x3)/dx2 if abs(dx2) >= eps else (y-y3)/dy2
-
-#        print ("x:{}, y:{}".format(x,y))
+    #        print ("x:{}, y:{}".format(x,y))
         if x < min(x1,x2)-eps or x > max(x1,x2)+eps:
 #            print ("c1")
             return None
