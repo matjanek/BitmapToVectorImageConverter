@@ -475,7 +475,7 @@ def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
             s1 = line_position(x1,y1,x2,y2,x3,y3)
             s2 = line_position(x1,y1,x2,y2,x5,y5)
             s = s1*s2
-            if s > -1:
+            if  abs(rx-x4) <= eps and (ry - y4) <= eps and s > -1:
                 print ("Styka się, ale nie przecina")
                 continue
 
