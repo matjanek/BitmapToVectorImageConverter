@@ -40,3 +40,16 @@ print ("tp2: {}".format(tp2))
 
 print ("A inside B: {}".format(polygon_inside(tp1,tp2,1000)))
 
+
+x1 = 83
+y1 = 65
+x2 = 599
+y2 = 65
+
+x3 = 110
+y3 = 69
+x4 = 117
+y4 = 62
+
+res = line_intersection(x1,y1,x2,y2,x3,y3,x4,y4)
+print ("Res: {}".format(res))

@@ -69,6 +69,11 @@ for seg1 in filtered_segments:
         poly2 = slines[seg2]
         inside = polygon_inside(poly1,poly2,width)
         seg_inside[(seg1,seg2)] = inside
+        if inside:
+            print ("Polygon {} inside {}".format(seg1, seg2))
+        else:
+            print ("Polygon {} not inside {}".format(seg1, seg2))
+
 #        if inside:
 #            print ("Segment {} in {}".format(seg1,seg2))
 #            print ("p1: {}".format(poly1))

@@ -366,10 +366,10 @@ def shoeShape(img): # bitmap
     img_color = image_mask(selmask, width, height, stride)
     return img_color
 
-def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 2.0):
-#    print("\n\n")
-#    print ("({},{}) - ({},{}) -> ({},{}) - ({},{})"
-#            .format(x1,y1,x2,y2,x3,y3,x4,y4))
+def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 0.5):
+#     print("\n\n")
+#     print ("({},{}) - ({},{}) -> ({},{}) - ({},{})"
+#             .format(x1,y1,x2,y2,x3,y3,x4,y4))
     a1 = y2-y1
     b1 = x2-x1
     c1 = a1*x1+b1*y1
@@ -381,13 +381,19 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 2.0):
 
 #    print("a2: {}, b2: {}, c2: {}".format(a2,b2,c2))
 
-    det = a1*b2 - a2*b1
+    det = float((x1-x2)*(y3-y4) - (y1-y2)*(y3-y4))
 #    print ("Det: {}".format(det))
-    if abs(det) < eps:
+    if abs(det) <= eps:
+#        print ("rownolegle")
         return None # linie równoległe
     else:
-        x = float(b2*c1 - b1*c2)/float(det)
-        y = float(a1*c2 - a2*c1)/float(det)
+        x = float((x1*y2 - y1*x2)*(x3-x4) - (x1-x2)*(x3*y4 - y3*x4))/float(det)
+        y = float((x1*y2 - y1*x2)*(y3-y4) - (y1-y2)*(x3*y4 - y3*x4))/float(det)
+        d1 = x2-x1
+        d2 = x4-x3
+        t1 = (x-x1)/d1
+        t2 = (x-x2)/d2
+
 #        print ("x:{}, y:{}".format(x,y))
         if x < min(x1,x2)-eps or x > max(x1,x2)+eps:
 #            print ("c1")
@@ -404,7 +410,6 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 2.0):
         if y < min(y3,y4)-eps or y > max(y3,y4)+eps:
 #            print ("c4")
             return None
-
 
         return (x,y)
 
@@ -423,7 +428,7 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
             (y4,x4) = poly2[j2]
 
             if line_intersection(x1,y1,x2,y2,x3,y3,x4,y4) != None:
-#                print ("Linia {}-ta przecina się z {}-tą".format(i,j))
+                print ("Linia {}-ta przecina się z {}-tą".format(i,j))
                 return False
 
     (qy,qx) = poly1[0]
@@ -442,6 +447,7 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
 
     c = 0
 
+    print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
     for i in range(0, m):
         i2 = (i+1)%m
 
@@ -449,14 +455,12 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
         (y4,x4) = poly2[i2]
 
         r2 = line_intersection(x1,y1,x2,y2,x3,y3,x4,y4)
-#        print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
-#        print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
+        print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
         if r2 != None:
-#            print ("Przecina się z {}-tą".format(i))
-#            print ("R2: {}".format(r2))
+            print ("Przecina się z {}-tą".format(i))
+            print ("R2: {}".format(r2))
             c += 1
-
-#    print ("c: {}".format(c))
+    print ("c: {}".format(c))
     return (c % 2 == 1)
 
 def mark_contours(img, c, cmask, segments, seg):
