@@ -394,24 +394,16 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 0.5):
         dy1 = y2-y1
         dy2 = y4-y3
 
-        tx1 = (x-x1)/dx1 if abs(dx1) >= eps else (y-y1)/dy1
-        tx2 = (x-x3)/dx2 if abs(dx2) >= eps else (y-y3)/dy2
+        t1 = (x-x1)/dx1 if abs(dx1) >= eps else (y-y1)/dy1
+        t2 = (x-x3)/dx2 if abs(dx2) >= eps else (y-y3)/dy2
 
 #        print ("x:{}, y:{}".format(x,y))
-        if x < min(x1,x2)-eps or x > max(x1,x2)+eps:
+        if t1 < -eps or t1 > 1.0+eps:
 #            print ("c1")
             return None
 
-        if x < min(x3,x4)-eps or x > max(x3,x4)+eps:
+        if t2 < -eps or t2 > 1.0+eps:
 #            print ("c2")
-            return None
-
-        if y < min(y1,y2)-eps or y > max(y1,y2)+eps:
-#            print ("c3")
-            return None
-
-        if y < min(y3,y4)-eps or y > max(y3,y4)+eps:
-#            print ("c4")
             return None
 
         return (x,y)
