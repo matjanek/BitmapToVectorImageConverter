@@ -408,7 +408,7 @@ def line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, eps = 0.5):
 
         return (x,y)
 
-def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
+def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
     n = len(poly1)
     m = len(poly2)
 
@@ -454,6 +454,10 @@ def polygon_inside(poly1, poly2,width): # czy p1 jest w p2
         if r2 != None:
             print ("Przecina się z {}-tą".format(i))
             print ("R2: {}".format(r2))
+            (rx,ry) = r2
+            if abs(rx-x3) <= eps and (ry - y3) <= eps:
+                print ("W poprzednim okrążeniu dodaliśmy, dodajemy tylko prawe końce - przeciecia")
+                continue
             c += 1
     print ("c: {}".format(c))
     return (c % 2 == 1)
