@@ -164,13 +164,13 @@ doc.Children.Add(g)
 doc.Write("save.svg")
 
 print("[{}] Saving img with contours ...".format(datetime.now()))
-save_color("contours.png", cmaskImg, width, height, stride)
+#save_color("contours.png", cmaskImg, width, height, stride)
 
 print("[{}] Saving img with contours ...".format(datetime.now()))
-save_color("m.png", m, width, height, stride)
+#save_color("m.png", m, width, height, stride)
 
 print("[{}] Saving cmask ...".format(datetime.now()))
-save_mask("cmask.png", cmask, width, height, stride)
+#save_mask("cmask.png", cmask, width, height, stride)
 
 col = Array.CreateInstance(Byte, 3)
 col[0] = 255
@@ -191,13 +191,13 @@ for seg in slines.keys():
     if counts[seg] < 20:
         continue
     
-    m = select_segment(segments, seg)
-    g = bool2gray(m)
-    c = gray2color(g)
+#    m = select_segment(segments, seg)
+#    g = bool2gray(m)
+#    c = gray2color(g)
     print ("Saving segment: {}".format(seg))
-    c2 = mark_contours(c, col, cmask, segments, seg)
-    c3 = mark_cline(c, col2, clines[seg])
-    c4 = mark_sline(c, col3, slines[seg])
-    save_color("seg-{}.png".format(seg),c2, width, height, stride)
-    save_color("seg-cline-{}.png".format(seg),c3, width, height, stride)
-    save_color("seg-sline-{}.png".format(seg),c4, width, height, stride)
+#    c2 = mark_contours(c, col, cmask, segments, seg)
+#    c3 = mark_cline(c, col2, clines[seg])
+#    c4 = mark_sline(c, col3, slines[seg])
+ #   save_color("seg-{}.png".format(seg),c2, width, height, stride)
+ #   save_color("seg-cline-{}.png".format(seg),c3, width, height, stride)
+ #   save_color("seg-sline-{}.png".format(seg),c4, width, height, stride)
