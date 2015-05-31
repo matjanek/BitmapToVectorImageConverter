@@ -50,7 +50,7 @@ namespace BitmapToVectorImageConverter.ImageComparison
                     ReportProgress(progress, 100 * (3 * i + 2) / iterations);
                     double ssimResult = new SSIM().Index(_model, image);
                     ReportProgress(progress, 100 * (3 * i + 3) / iterations);
-                    results += _fileNames[i] + ";" + percentageResult + ";" + mseResult + ";" + ssimResult + "\r\n";
+                    results += _fileNames[i] + ";" + percentageResult.ToString("E3") + ";" + mseResult.ToString("E3") + ";" + ssimResult.ToString("E3") + "\r\n";
                 }
                 else
                 {
