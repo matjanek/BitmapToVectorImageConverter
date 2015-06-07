@@ -434,7 +434,7 @@ def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
             (y4,x4) = poly2[j2]
 
             if line_intersection(x1,y1,x2,y2,x3,y3,x4,y4) != None:
-                print ("Linia {}-ta przecina się z {}-tą".format(i,j))
+#                print ("Linia {}-ta przecina się z {}-tą".format(i,j))
                 return False
 
     (qy,qx) = poly1[0]
@@ -453,7 +453,7 @@ def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
 
     c = 0
 
-    print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
+    # print ("Półprosta ({},{}) - ({},{})".format(x1,y1,x2,y2))
     for i in range(0, m):
         i2 = (i+1)%m
         i3 = (i+2)%m
@@ -463,25 +463,25 @@ def polygon_inside(poly1, poly2,width, eps = 1): # czy p1 jest w p2
         (y5,x5) = poly2[i3]
 
         r2 = line_intersection(x1,y1,x2,y2,x3,y3,x4,y4)
-        print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
+        #print ("Linia ({},{}) - ({},{})".format(x3,y3,x4,y4))
         if r2 != None:
-            print ("Przecina się z {}-tą".format(i))
-            print ("R2: {}".format(r2))
+            #print ("Przecina się z {}-tą".format(i))
+            #print ("R2: {}".format(r2))
             (rx,ry) = r2
             if abs(rx-x3) <= eps and (ry - y3) <= eps:
-                print ("W poprzednim okrążeniu dodaliśmy, dodajemy tylko prawe końce - przeciecia")
+#                print ("W poprzednim okrążeniu dodaliśmy, dodajemy tylko prawe końce - przeciecia")
                 continue
 
             s1 = line_position(x1,y1,x2,y2,x3,y3)
             s2 = line_position(x1,y1,x2,y2,x5,y5)
             s = s1*s2
             if  abs(rx-x4) <= eps and (ry - y4) <= eps and s > -1:
-                print ("Styka się, ale nie przecina")
+                #print ("Styka się, ale nie przecina")
                 continue
 
             c += 1
 
-    print ("c: {}".format(c))
+    #print ("c: {}".format(c))
     return (c % 2 == 1)
 
 def mark_contours(img, c, cmask, segments, seg):

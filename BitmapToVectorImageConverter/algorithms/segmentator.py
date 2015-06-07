@@ -135,7 +135,6 @@ for seg in xlines2:
     print ("Segment: {}, color: {}".format(seg, cx))
     c3 = Color.FromArgb(cx, cx, cx)
     poly = SvgPolygon()
-    poly.Stroke = SvgColourServer(Color.Red)
     poly.Fill = SvgColourServer(c3)
     poly.StrokeWidth = SvgUnit(1)
     poly.Points = SvgPointCollection()
