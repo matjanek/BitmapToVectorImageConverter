@@ -18,9 +18,9 @@ ns_give = True if argc < 3 or argv[2] != "0" else False
 
 ns = "{http://www.w3.org/2000/svg}" if ns_give else ""
 root = etree.parse(fpath)
-exp = "{}polygon".format(ns,ns)
+exp = "//{}polygon".format(ns,ns)
 polygons = root.findall(exp)
-exp2 = "{}path".format(ns,ns)
+exp2 = "//{}path".format(ns,ns)
 paths = root.findall(exp2)
 
 
